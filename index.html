@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receitas e Despesas - Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f5f4f0;
+            --surface: #ffffff;
+            --border: #e2e0d8;
+            --text: #1a1a18;
+            --accent: #1a1a18;
+            --radius: 12px;
+            --danger: #c0392b;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container { width: 100%; max-width: 600px; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { font-size: 28px; font-weight: 700; }
+
+        /* Botão de Busca Superior */
+        .btn-buscar {
+            width: 100%;
+            background: #ffffff;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            padding: 15px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-buscar:hover {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        /* Card de cada Cartão */
+        .card-summary {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-cartao {
+            background: #e2e0d8;
+            color: var(--text);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .valor-soma {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--danger);
+        }
+
+        /* Botão Inferior de Navegação Estilizado */
+        .nav-link {
+            display: block;
+            text-align: center;
+            margin-top: 2rem;
+            background: #ffffff;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid var(--accent);
+            padding: 15px;
+            border-radius: var(--radius);
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .nav-link:hover {
+            background: var(--accent);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Receitas e Despesas</h1>
+    </header>
+
+    <button class="btn-buscar" onclick="buscarDados()">Buscar Dados do Cartão</button>
+
+    <div id="dashboard">
+        </div>
+
+    <a href="ReceitasEDespesas.html" class="nav-link">Gerenciar Lançamentos →</a>
+</div>
+
+<script>
+    // Nome exato do arquivo na sua pasta
+    const JSON_FILE = 'despesas_2026-04-05.json';
+
+    async function buscarDados() {
+        const dashboard = document.getElementById('dashboard');
+        
+        try {
+            const response = await fetch(JSON_FILE);
+            if (!response.ok) throw new Error("Arquivo não encontrado.");
+
+            const despesas = await response.json();
+            
+            // Agrupamento Robusto: Garante que cada cartão único crie uma entrada
+            const resumo = {};
+            
+            despesas.forEach(item => {
+                const nomeCartao = item.cartao || "Outros";
+                const valorNumerico = parseFloat(item.valor) || 0;
+                
+                if (!resumo[nomeCartao]) {
+                    resumo[nomeCartao] = 0;
+                }
+                resumo[nomeCartao] += valorNumerico;
+            });
+
+            renderizar(resumo);
+
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao ler dados. Verifique se o arquivo " + JSON_FILE + " está na mesma pasta.");
+        }
+    }
+
+    function renderizar(resumo) {
+        const dashboard = document.getElementById('dashboard');
+        dashboard.innerHTML = ""; // Limpa a tela
+        
+        const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        // Itera sobre todas as chaves do objeto (Itaú, Nubank, etc)
+        const cartoesEncontrados = Object.keys(resumo);
+
+        if (cartoesEncontrados.length === 0) {
+            dashboard.innerHTML = "<p style='text-align:center'>Nenhum cartão encontrado.</p>";
+            return;
+        }
+
+        cartoesEncontrados.forEach(cartao => {
+            const div = document.createElement('div');
+            div.className = 'card-summary';
+            div.innerHTML = `
+                <button class="btn-cartao">${cartao}</button>
+                <span class="valor-soma">${fmt(resumo[cartao])}</span>
+            `;
+            dashboard.appendChild(div);
+        });
+    }
+</script>
+
+</body>
+</html>
