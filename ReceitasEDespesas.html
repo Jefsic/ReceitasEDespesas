@@ -13,9 +13,10 @@
         
         <header>
             <h1>💳 Despesas de cartão</h1>
-            <p>Cadastre, edite e acompanhe seus gastos parcelados</p>
+            <p>Cadastre, edite e filtre seus gastos parcelados</p>
         </header>
 
+        <!-- Formulário de nova despesa -->
         <div class="card">
             <form id="formDespesa" onsubmit="return false;">
                 <div class="form-grid">
@@ -55,61 +56,26 @@
                         <label for="cartao">Cartão *</label>
                         <select id="cartao" required>
                             <option value="">Selecione...</option>
+                            <option>Caixa Visa</option>
+                            <option>Caixa Elo</option>
+                            <option>Caixa Black</option>
                             <option>Nubank</option>
-                            <option>Itaú</option>
-                            <option>Bradesco</option>
-                            <option>Santander</option>
-                            <option>Caixa</option>
                             <option>Inter</option>
-                            <option>C6 Bank</option>
-                            <option>XP</option>
-                            <option>Outro</option>
+                            <option>Porto</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="parcelas">Parcelas (até 24x)</label>
                         <select id="parcelas">
                             <option value="1">1x (à vista)</option>
-                            <option value="2">2x</option>
-                            <option value="3">3x</option>
-                            <option value="4">4x</option>
-                            <option value="5">5x</option>
-                            <option value="6">6x</option>
-                            <option value="7">7x</option>
-                            <option value="8">8x</option>
-                            <option value="9">9x</option>
-                            <option value="10">10x</option>
-                            <option value="11">11x</option>
-                            <option value="12">12x</option>
-                            <option value="13">13x</option>
-                            <option value="14">14x</option>
-                            <option value="15">15x</option>
-                            <option value="16">16x</option>
-                            <option value="17">17x</option>
-                            <option value="18">18x</option>
-                            <option value="19">19x</option>
-                            <option value="20">20x</option>
-                            <option value="21">21x</option>
-                            <option value="22">22x</option>
-                            <option value="23">23x</option>
-                            <option value="24">24x</option>
-                        </select>
-                    </div>
-                    <div class="form-group full">
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="despRecorrente">
-                            <label for="despRecorrente">
-                                🔄 Despesa recorrente
-                                <span class="info-icon" title="Despesas recorrentes como assinaturas, mensalidades, etc. serão destacadas na listagem.">?</span>
-                            </label>
-                            <small>(Ex: assinaturas, mensalidades)</small>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="status">Status</label>
-                        <select id="status">
-                            <option value="pendente">Pendente</option>
-                            <option value="pago">Pago</option>
+                            <option value="2">2x</option><option value="3">3x</option><option value="4">4x</option>
+                            <option value="5">5x</option><option value="6">6x</option><option value="7">7x</option>
+                            <option value="8">8x</option><option value="9">9x</option><option value="10">10x</option>
+                            <option value="11">11x</option><option value="12">12x</option><option value="13">13x</option>
+                            <option value="14">14x</option><option value="15">15x</option><option value="16">16x</option>
+                            <option value="17">17x</option><option value="18">18x</option><option value="19">19x</option>
+                            <option value="20">20x</option><option value="21">21x</option><option value="22">22x</option>
+                            <option value="23">23x</option><option value="24">24x</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -120,6 +86,15 @@
                             <option value="Ambos">Ambos</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <div class="checkbox-group" style="margin-top: 24px;">
+                            <input type="checkbox" id="despRecorrente">
+                            <label for="despRecorrente">
+                                🔄 Despesa recorrente
+                                <span class="info-icon" title="Despesas recorrentes como assinaturas, mensalidades, etc.">?</span>
+                            </label>
+                        </div>
+                    </div>
                     <div class="form-group full">
                         <button type="submit" class="btn-primary" onclick="addDespesa()">Adicionar despesa</button>
                     </div>
@@ -127,39 +102,66 @@
             </form>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <p class="section-label" style="margin-bottom: 0;">📋 Despesas cadastradas</p>
-            <div style="display: flex; gap: 8px;">
-                <button class="btn-outline" onclick="exportarJSON()" style="font-size: 12px; padding: 6px 12px;">↓ Exportar</button>
-                <button class="btn-outline" onclick="document.getElementById('importInput').click()" style="font-size: 12px; padding: 6px 12px;">↑ Importar</button>
-                <button class="btn-outline" onclick="fazerBackupAutomatico()" style="font-size: 12px; padding: 6px 12px;">💾 Backup agora</button>
-                <button class="btn-outline" onclick="limparTodasDespesas()" style="border-color: var(--danger); color: var(--danger); font-size: 12px; padding: 6px 12px;">🗑️ Limpar</button>
+        <!-- Cards de resumo por banco para a próxima fatura -->
+        <div style="margin-bottom: 1.5rem;">
+            <p class="section-label">📆 Próxima fatura (vencimento dia 20) - Total por cartão</p>
+            <div id="resumoProximaFatura" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <!-- Cards serão inseridos aqui dinamicamente -->
             </div>
         </div>
-        <input type="file" id="importInput" accept=".json" style="display:none" onchange="importarJSON(event)">
 
-        <div class="summary">
-            <div class="metric">
-                <div class="metric-label">Total gasto</div>
-                <div class="metric-value danger mono" id="total">R$ 0,00</div>
+        <!-- Painel de Filtros Avançados -->
+        <div class="filters-panel">
+            <div class="filters-title">
+                🔍 Filtros Avançados
+                <button class="btn-limpar-filtros" onclick="limparFiltros()">Limpar filtros</button>
             </div>
-            <div class="metric">
-                <div class="metric-label">A pagar</div>
-                <div class="metric-value mono" id="apagar">R$ 0,00</div>
+            <div class="filters-grid">
+                <div class="filter-item">
+                    <label>📋 Tipo de visualização</label>
+                    <select id="filtroVisualizacao" onchange="aplicarFiltros()">
+                        <option value="proximaFatura">📆 Próxima fatura (dia 20)</option>
+                        <option value="todas">📋 Todas as despesas cadastradas</option>
+                        <option value="porCartao">💳 Por cartão</option>
+                        <option value="porDevedor">👥 Por devedor</option>
+                    </select>
+                </div>
+                <div class="filter-item" id="filtroCartaoContainer" style="display: none;">
+                    <label>💳 Selecionar cartão</label>
+                    <select id="filtroCartao" onchange="aplicarFiltros()">
+                        <option value="">Todos os cartões</option>
+                    </select>
+                </div>
+                <div class="filter-item" id="filtroDevedorContainer" style="display: none;">
+                    <label>👤 Selecionar devedor</label>
+                    <select id="filtroDevedor" onchange="aplicarFiltros()">
+                        <option value="">Todos</option>
+                        <option value="Jefferson">Jefferson</option>
+                        <option value="Erika">Erika</option>
+                        <option value="Ambos">Ambos</option>
+                    </select>
+                </div>
             </div>
-            <div class="metric">
-                <div class="metric-label">Lançamentos</div>
-                <div class="metric-value muted" id="count">0</div>
-            </div>
+        </div>
+
+        <div class="info-bar">
+            <p class="section-label" style="margin-bottom: 0;">📋 Despesas Cadastradas - filtros</p>
+            <div class="result-count" id="resultCount">0 despesa(s)</div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn-outline" onclick="exportarJSON()">↓ Exportar JSON</button>
+            <button class="btn-outline" onclick="document.getElementById('importInput').click()">↑ Importar JSON</button>
+            <input type="file" id="importInput" accept=".json" style="display:none" onchange="importarJSON(event)">
+            <button class="btn-outline" onclick="limparTodasDespesas()" style="border-color: var(--danger); color: var(--danger);">🗑️ Limpar todas</button>
         </div>
 
         <div class="table-wrap">
             <table>
                 <colgroup>
-                    <col style="width:18%">
-                    <col class="col-cat" style="width:10%">
-                    <col class="col-cart" style="width:10%">
-                    <col style="width:8%">
+                    <col style="width:20%">
+                    <col class="col-cat" style="width:12%">
+                    <col class="col-cart" style="width:12%">
                     <col style="width:8%">
                     <col style="width:8%">
                     <col style="width:8%">
@@ -176,21 +178,20 @@
                         <th>Data Compra</th>
                         <th>Vencimento</th>
                         <th>Parcela</th>
-                        <th>Status</th>
                         <th>Devedor</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="tbody">
                     <tr>
-                        <td colspan="10" class="empty">Carregando despesas...</td>
+                        <td colspan="9" class="empty">Carregando despesas...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <div style="margin-top: 1rem; padding: 0.75rem; background: var(--bg); border-radius: var(--radius-sm); font-size: 12px; color: var(--text-muted); text-align: center;">
-            💡 Os dados são salvos automaticamente no navegador. Para não perder seus dados, exporte um backup periodicamente.
+            💡 Dica: Use os filtros para visualizar apenas as despesas que você precisa. Os dados são salvos automaticamente.
         </div>
     </div>
 
@@ -220,51 +221,28 @@
                 <div class="form-group">
                     <label>Categoria</label>
                     <select id="editCategoria">
-                        <option>Alimentação</option>
-                        <option>Transporte</option>
-                        <option>Saúde</option>
-                        <option>Lazer</option>
-                        <option>Educação</option>
-                        <option>Casa</option>
-                        <option>Assinaturas</option>
-                        <option>Roupas</option>
-                        <option>Viagem</option>
-                        <option>Outros</option>
+                        <option>Alimentação</option><option>Transporte</option><option>Saúde</option>
+                        <option>Lazer</option><option>Educação</option><option>Casa</option>
+                        <option>Assinaturas</option><option>Roupas</option><option>Viagem</option><option>Outros</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Cartão</label>
                     <select id="editCartao">
-                        <option>Nubank</option>
-                        <option>Itaú</option>
-                        <option>Bradesco</option>
-                        <option>Santander</option>
-                        <option>Caixa</option>
-                        <option>Inter</option>
-                        <option>C6 Bank</option>
-                        <option>XP</option>
-                        <option>Outro</option>
+                        <option>Caixa Visa</option><option>Caixa Elo</option><option>Caixa Black</option>
+                        <option>Nubank</option><option>Inter</option><option>Porto</option>
                     </select>
                 </div>
-                <div class="form-group full">
-                    <div class="checkbox-group">
+                <div class="form-group">
+                    <div class="checkbox-group" style="margin-top: 24px;">
                         <input type="checkbox" id="editDespRecorrente">
                         <label>🔄 Despesa recorrente</label>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
-                    <select id="editStatus">
-                        <option value="pendente">Pendente</option>
-                        <option value="pago">Pago</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label>Devedor</label>
                     <select id="editDevedor">
-                        <option>Jefferson</option>
-                        <option>Erika</option>
-                        <option>Ambos</option>
+                        <option>Jefferson</option><option>Erika</option><option>Ambos</option>
                     </select>
                 </div>
                 <div class="form-group full">
@@ -278,72 +256,133 @@
 
     <script>
         const STORAGE_KEY = 'despesas_cartao_v2';
-        const BACKUP_KEY = 'despesas_backup_auto';
         const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         let despesas = [];
+        let despesasFiltradas = [];
+
+        function getProximaDataFatura() {
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            let dataFatura = new Date(hoje.getFullYear(), hoje.getMonth(), 20);
+            if (hoje.getDate() > 20) {
+                dataFatura.setMonth(dataFatura.getMonth() + 1);
+            }
+            return dataFatura;
+        }
 
         function carregarLocal() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
                 if (raw) {
                     despesas = JSON.parse(raw);
-                    console.log(`✅ Carregadas ${despesas.length} despesas do localStorage`);
+                    console.log(`✅ Carregadas ${despesas.length} despesas`);
                 } else {
-                    // Tentar carregar do backup automático
-                    const backup = localStorage.getItem(BACKUP_KEY);
-                    if (backup) {
-                        despesas = JSON.parse(backup);
-                        console.log(`✅ Carregadas ${despesas.length} despesas do backup`);
-                        salvarLocal(); // Restaurar para o storage principal
-                    } else {
-                        despesas = [];
-                        console.log('📭 Nenhuma despesa encontrada');
-                    }
+                    despesas = [];
                 }
+                atualizarSelects();
+                atualizarResumoProximaFatura();
+                aplicarFiltros();
             } catch (e) {
-                console.error('Erro ao carregar:', e);
+                console.error('Erro:', e);
                 despesas = [];
             }
+        }
+
+        function atualizarResumoProximaFatura() {
+            const { inicio, fim } = getDataFaturaProxima();
+            const despesasProximaFatura = despesas.filter(d => {
+                const dataVencto = new Date(d.data);
+                return dataVencto >= inicio && dataVencto <= fim;
+            });
+            
+            const resumoPorCartao = {};
+            despesasProximaFatura.forEach(d => {
+                const cartao = d.cartao;
+                if (!resumoPorCartao[cartao]) {
+                    resumoPorCartao[cartao] = 0;
+                }
+                resumoPorCartao[cartao] += d.valor;
+            });
+            
+            const container = document.getElementById('resumoProximaFatura');
+            const cartoes = Object.keys(resumoPorCartao).sort();
+            
+            if (cartoes.length === 0) {
+                container.innerHTML = '<div class="card-summary" style="justify-content: center; color: var(--text-muted);">Nenhuma despesa para a próxima fatura</div>';
+                return;
+            }
+            
+            container.innerHTML = cartoes.map(cartao => `
+                <div class="card-summary">
+                    <strong>${cartao}</strong>
+                    <span class="valor-soma">${fmt(resumoPorCartao[cartao])}</span>
+                </div>
+            `).join('');
+        }
+
+        function atualizarSelects() {
+            const cartoes = [...new Set(despesas.map(d => d.cartao).filter(c => c))];
+            const selectCartao = document.getElementById('filtroCartao');
+            selectCartao.innerHTML = '<option value="">Todos os cartões</option>' + 
+                cartoes.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        function getDataFaturaProxima() {
+            const dataFatura = getProximaDataFatura();
+            const inicio = new Date(dataFatura);
+            inicio.setDate(1);
+            inicio.setHours(0, 0, 0, 0);
+            const fim = new Date(dataFatura);
+            fim.setMonth(fim.getMonth() + 1);
+            fim.setDate(0);
+            fim.setHours(23, 59, 59, 999);
+            return { inicio, fim, dataFatura };
+        }
+
+        function aplicarFiltros() {
+            const visualizacao = document.getElementById('filtroVisualizacao').value;
+            const cartaoSelecionado = document.getElementById('filtroCartao').value;
+            const devedorSelecionado = document.getElementById('filtroDevedor').value;
+            
+            document.getElementById('filtroCartaoContainer').style.display = 
+                visualizacao === 'porCartao' ? 'block' : 'none';
+            document.getElementById('filtroDevedorContainer').style.display = 
+                visualizacao === 'porDevedor' ? 'block' : 'none';
+            
+            let filtradas = [...despesas];
+            
+            if (visualizacao === 'proximaFatura') {
+                const { inicio, fim } = getDataFaturaProxima();
+                filtradas = filtradas.filter(d => {
+                    const dataVencto = new Date(d.data);
+                    return dataVencto >= inicio && dataVencto <= fim;
+                });
+            } else if (visualizacao === 'porCartao' && cartaoSelecionado) {
+                filtradas = filtradas.filter(d => d.cartao === cartaoSelecionado);
+            } else if (visualizacao === 'porDevedor' && devedorSelecionado) {
+                filtradas = filtradas.filter(d => d.devedor === devedorSelecionado);
+            }
+            
+            despesasFiltradas = filtradas;
+            renderTabela();
+        }
+
+        function limparFiltros() {
+            document.getElementById('filtroVisualizacao').value = 'proximaFatura';
+            document.getElementById('filtroCartao').value = '';
+            document.getElementById('filtroDevedor').value = '';
+            aplicarFiltros();
+            toast('Filtros limpos!');
         }
 
         function salvarLocal() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(despesas));
-                // Fazer backup automático a cada salvamento
-                localStorage.setItem(BACKUP_KEY, JSON.stringify(despesas));
-                console.log(`💾 Salvas ${despesas.length} despesas no localStorage e backup`);
+                console.log(`💾 Salvas ${despesas.length} despesas`);
+                atualizarSelects();
+                atualizarResumoProximaFatura();
             } catch (e) {
                 console.error('Erro ao salvar:', e);
-            }
-        }
-
-        function fazerBackupAutomatico() {
-            try {
-                const backup = {
-                    data: new Date().toISOString(),
-                    quantidade: despesas.length,
-                    dados: despesas
-                };
-                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `backup_despesas_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-                toast('Backup manual criado com sucesso!');
-            } catch (e) {
-                toast('Erro ao criar backup');
-            }
-        }
-
-        function limparTodasDespesas() {
-            if (confirm('⚠️ ATENÇÃO: Isso irá remover TODAS as despesas cadastradas. Esta ação não pode ser desfeita. Deseja continuar?')) {
-                despesas = [];
-                salvarLocal();
-                renderTabela();
-                renderSummary();
-                toast('Todas as despesas foram removidas.');
             }
         }
 
@@ -379,8 +418,7 @@
                     if (!Array.isArray(dados)) throw new Error();
                     despesas = dados;
                     salvarLocal();
-                    renderTabela();
-                    renderSummary();
+                    aplicarFiltros();
                     toast(`${dados.length} lançamento(s) importado(s).`);
                 } catch {
                     toast('Arquivo inválido.');
@@ -399,7 +437,6 @@
             const cartao = document.getElementById('cartao').value;
             const parcelas = parseInt(document.getElementById('parcelas').value);
             const despRecorrente = document.getElementById('despRecorrente').checked;
-            const status = document.getElementById('status').value;
             const devedor = document.getElementById('devedor').value;
 
             if (!desc || !valor || !dataCompra || !data || !categoria || !cartao) {
@@ -430,15 +467,13 @@
                     parcelaAtual: i + 1,
                     parcelaTotal: parcelas,
                     despRecorrente: despRecorrente,
-                    status,
                     devedor
                 };
             });
 
             despesas = [...novas, ...despesas];
             salvarLocal();
-            renderTabela();
-            renderSummary();
+            aplicarFiltros();
 
             document.getElementById('desc').value = '';
             document.getElementById('valor').value = '';
@@ -448,11 +483,8 @@
             document.getElementById('cartao').value = '';
             document.getElementById('parcelas').value = '1';
             document.getElementById('despRecorrente').checked = false;
-            document.getElementById('status').value = 'pendente';
 
-            const msg = parcelas === 1
-                ? 'Despesa adicionada!'
-                : `${parcelas} parcelas de ${fmt(valorParcela)} adicionadas!`;
+            const msg = parcelas === 1 ? 'Despesa adicionada!' : `${parcelas} parcelas de ${fmt(valorParcela)} adicionadas!`;
             toast(msg);
         }
 
@@ -468,7 +500,6 @@
             document.getElementById('editCategoria').value = despesa.categoria;
             document.getElementById('editCartao').value = despesa.cartao;
             document.getElementById('editDespRecorrente').checked = despesa.despRecorrente || false;
-            document.getElementById('editStatus').value = despesa.status;
             document.getElementById('editDevedor').value = despesa.devedor;
 
             document.getElementById('editModal').style.display = 'block';
@@ -488,13 +519,11 @@
                     categoria: document.getElementById('editCategoria').value,
                     cartao: document.getElementById('editCartao').value,
                     despRecorrente: document.getElementById('editDespRecorrente').checked,
-                    status: document.getElementById('editStatus').value,
                     devedor: document.getElementById('editDevedor').value
                 };
                 
                 salvarLocal();
-                renderTabela();
-                renderSummary();
+                aplicarFiltros();
                 fecharModal();
                 toast('Despesa atualizada com sucesso!');
             }
@@ -504,35 +533,52 @@
             document.getElementById('editModal').style.display = 'none';
         }
 
+        function limparTodasDespesas() {
+            if (confirm('⚠️ ATENÇÃO: Isso irá remover TODAS as despesas. Esta ação não pode ser desfeita. Deseja continuar?')) {
+                despesas = [];
+                salvarLocal();
+                aplicarFiltros();
+                toast('Todas as despesas foram removidas.');
+            }
+        }
+
         function deleteDespesa(id) {
             const d = despesas.find(x => x.id === id);
             if (!d) return;
             
             if (d.parcelaTotal > 1) {
-                const todas = confirm(
-                    `Esta despesa tem ${d.parcelaTotal} parcelas.\n\nOK = remover todas as parcelas\nCancelar = remover só esta parcela`
-                );
-                despesas = todas
-                    ? despesas.filter(x => x.grupoId !== d.grupoId)
-                    : despesas.filter(x => x.id !== id);
+                const todas = confirm(`Esta despesa tem ${d.parcelaTotal} parcelas.\n\nOK = remover todas\nCancelar = remover só esta parcela`);
+                despesas = todas ? despesas.filter(x => x.grupoId !== d.grupoId) : despesas.filter(x => x.id !== id);
             } else {
                 if (!confirm('Remover esta despesa?')) return;
                 despesas = despesas.filter(x => x.id !== id);
             }
             salvarLocal();
-            renderTabela();
-            renderSummary();
+            aplicarFiltros();
             toast('Removido com sucesso.');
+        }
+
+        function getDevedorClass(devedor) {
+            const classes = {
+                'Jefferson': 'devedor-Jefferson',
+                'Erika': 'devedor-Erika',
+                'Ambos': 'devedor-Ambos'
+            };
+            return classes[devedor] || '';
         }
 
         function renderTabela() {
             const tbody = document.getElementById('tbody');
-            if (despesas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="empty">Nenhuma despesa cadastrada. Adicione uma nova despesa!</td></tr>';
+            const resultCount = document.getElementById('resultCount');
+            
+            resultCount.textContent = `${despesasFiltradas.length} despesa(s) exibida(s)`;
+            
+            if (despesasFiltradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty">Nenhuma despesa encontrada com os filtros atuais.</td></tr>';
                 return;
             }
             
-            tbody.innerHTML = despesas.map(d => {
+            tbody.innerHTML = despesasFiltradas.map(d => {
                 const [y, m, day] = d.data.split('-');
                 const dataFmt = `${day}/${m}/${y}`;
                 const dataCompraFmt = d.dataCompra ? (() => {
@@ -542,26 +588,19 @@
                 const parcLabel = d.parcelaTotal === 1
                     ? '<span style="color:var(--text-faint);font-size:12px">à vista</span>'
                     : `<span class="parc-pill">${d.parcelaAtual}/${d.parcelaTotal}</span>`;
-                const badge = d.status === 'pago'
-                    ? '<span class="badge badge-pago">pago</span>'
-                    : '<span class="badge badge-pendente">pendente</span>';
-                const recorrenteBadge = d.despRecorrente 
-                    ? '<span class="recorrente-badge">🔄 Recorrente</span>' 
-                    : '';
+                const recorrenteBadge = d.despRecorrente ? '<span class="recorrente-badge">🔄</span>' : '';
+                const devedorClass = getDevedorClass(d.devedor);
                 
                 return `
                     <tr>
-                        <td style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${d.desc}">
-                            ${d.desc} ${recorrenteBadge}
-                        </td>
+                        <td style="font-weight:500" title="${d.desc}">${d.desc} ${recorrenteBadge}</td>
                         <td class="col-cat"><span class="cat-pill">${d.categoria}</span></td>
-                        <td class="col-cart" style="color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.cartao}</td>
+                        <td class="col-cart">${d.cartao}</td>
                         <td class="mono" style="font-weight:500">${fmt(d.valor)}</td>
-                        <td style="color:var(--text-muted); font-size: 12px;">${dataCompraFmt}</td>
-                        <td style="color:var(--text-muted)">${dataFmt}</td>
+                        <td style="font-size: 12px;">${dataCompraFmt}</td>
+                        <td>${dataFmt}</td>
                         <td>${parcLabel}</td>
-                        <td>${badge}</td>
-                        <td style="color:var(--text-muted)">${d.devedor || '—'}</td>
+                        <td><span class="devedor-badge ${devedorClass}">${d.devedor || '—'}</span></td>
                         <td>
                             <button class="btn-edit" onclick="editarDespesa(${d.id})" title="Editar">✏️</button>
                             <button class="btn-del" onclick="deleteDespesa(${d.id})" title="Remover">×</button>
@@ -571,33 +610,15 @@
             }).join('');
         }
 
-        function renderSummary() {
-            const total = despesas.reduce((s, d) => s + d.valor, 0);
-            const apagar = despesas.filter(d => d.status === 'pendente').reduce((s, d) => s + d.valor, 0);
-            document.getElementById('total').textContent = fmt(total);
-            document.getElementById('apagar').textContent = fmt(apagar);
-            document.getElementById('count').textContent = despesas.length;
-        }
-
         window.onclick = function(event) {
             const modal = document.getElementById('editModal');
-            if (event.target === modal) {
-                fecharModal();
-            }
+            if (event.target === modal) fecharModal();
         }
 
-        // Inicialização - CARREGA DADOS AUTOMATICAMENTE
+        // Inicialização
         document.getElementById('dataCompra').valueAsDate = new Date();
         document.getElementById('data').valueAsDate = new Date();
         carregarLocal();
-        renderTabela();
-        renderSummary();
-        
-        if (despesas.length > 0) {
-            toast(`${despesas.length} despesa(s) carregada(s) automaticamente.`);
-        } else {
-            console.log('Nenhuma despesa encontrada. Adicione uma nova despesa!');
-        }
     </script>
 </body>
 </html>
