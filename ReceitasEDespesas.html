@@ -9,12 +9,13 @@
 </head>
 <body>
     <div class="container">
+        <a href="index.html" class="btn-voltar">← Voltar para Dashboard</a>
+        
         <header>
             <h1>💳 Despesas de cartão</h1>
             <p>Cadastre, edite e acompanhe seus gastos parcelados</p>
         </header>
 
-        <p class="section-label">➕ Nova despesa</p>
         <div class="card">
             <form id="formDespesa" onsubmit="return false;">
                 <div class="form-grid">
@@ -27,7 +28,11 @@
                         <input type="number" id="valor" placeholder="0,00" min="0" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label for="data">Data da 1ª parcela *</label>
+                        <label for="dataCompra">Data da compra *</label>
+                        <input type="date" id="dataCompra" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="data">Data fatura 1ª parcela *</label>
                         <input type="date" id="data" required>
                     </div>
                     <div class="form-group">
@@ -62,7 +67,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="parcelas">Parcelas</label>
+                        <label for="parcelas">Parcelas (até 24x)</label>
                         <select id="parcelas">
                             <option value="1">1x (à vista)</option>
                             <option value="2">2x</option>
@@ -76,7 +81,29 @@
                             <option value="10">10x</option>
                             <option value="11">11x</option>
                             <option value="12">12x</option>
+                            <option value="13">13x</option>
+                            <option value="14">14x</option>
+                            <option value="15">15x</option>
+                            <option value="16">16x</option>
+                            <option value="17">17x</option>
+                            <option value="18">18x</option>
+                            <option value="19">19x</option>
+                            <option value="20">20x</option>
+                            <option value="21">21x</option>
+                            <option value="22">22x</option>
+                            <option value="23">23x</option>
+                            <option value="24">24x</option>
                         </select>
+                    </div>
+                    <div class="form-group full">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="despRecorrente">
+                            <label for="despRecorrente">
+                                🔄 Despesa recorrente
+                                <span class="info-icon" title="Despesas recorrentes como assinaturas, mensalidades, etc. serão destacadas na listagem.">?</span>
+                            </label>
+                            <small>(Ex: assinaturas, mensalidades)</small>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="status">Status</label>
@@ -100,13 +127,16 @@
             </form>
         </div>
 
-        <p class="section-label">📋 Despesas cadastradas</p>
-
-        <div class="toolbar">
-            <button class="btn-outline" onclick="exportarJSON()">↓ Exportar JSON</button>
-            <button class="btn-outline" onclick="document.getElementById('importInput').click()">↑ Importar JSON</button>
-            <input type="file" id="importInput" accept=".json" style="display:none" onchange="importarJSON(event)">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <p class="section-label" style="margin-bottom: 0;">📋 Despesas cadastradas</p>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-outline" onclick="exportarJSON()" style="font-size: 12px; padding: 6px 12px;">↓ Exportar</button>
+                <button class="btn-outline" onclick="document.getElementById('importInput').click()" style="font-size: 12px; padding: 6px 12px;">↑ Importar</button>
+                <button class="btn-outline" onclick="fazerBackupAutomatico()" style="font-size: 12px; padding: 6px 12px;">💾 Backup agora</button>
+                <button class="btn-outline" onclick="limparTodasDespesas()" style="border-color: var(--danger); color: var(--danger); font-size: 12px; padding: 6px 12px;">🗑️ Limpar</button>
+            </div>
         </div>
+        <input type="file" id="importInput" accept=".json" style="display:none" onchange="importarJSON(event)">
 
         <div class="summary">
             <div class="metric">
@@ -126,14 +156,15 @@
         <div class="table-wrap">
             <table>
                 <colgroup>
-                    <col style="width:21%">
-                    <col class="col-cat" style="width:12%">
-                    <col class="col-cart" style="width:11%">
-                    <col style="width:11%">
-                    <col style="width:10%">
-                    <col style="width:10%">
-                    <col style="width:10%">
-                    <col style="width:10%">
+                    <col style="width:18%">
+                    <col class="col-cat" style="width:10%">
+                    <col class="col-cart" style="width:10%">
+                    <col style="width:8%">
+                    <col style="width:8%">
+                    <col style="width:8%">
+                    <col style="width:8%">
+                    <col style="width:8%">
+                    <col style="width:8%">
                     <col style="width:5%">
                 </colgroup>
                 <thead>
@@ -142,6 +173,7 @@
                         <th class="col-cat">Categoria</th>
                         <th class="col-cart">Cartão</th>
                         <th>Valor</th>
+                        <th>Data Compra</th>
                         <th>Vencimento</th>
                         <th>Parcela</th>
                         <th>Status</th>
@@ -151,10 +183,14 @@
                 </thead>
                 <tbody id="tbody">
                     <tr>
-                        <td colspan="9" class="empty">Nenhuma despesa cadastrada ainda.</td>
+                        <td colspan="10" class="empty">Carregando despesas...</td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+        
+        <div style="margin-top: 1rem; padding: 0.75rem; background: var(--bg); border-radius: var(--radius-sm); font-size: 12px; color: var(--text-muted); text-align: center;">
+            💡 Os dados são salvos automaticamente no navegador. Para não perder seus dados, exporte um backup periodicamente.
         </div>
     </div>
 
@@ -174,7 +210,11 @@
                     <input type="number" id="editValor" step="0.01">
                 </div>
                 <div class="form-group">
-                    <label>Data</label>
+                    <label>Data da compra</label>
+                    <input type="date" id="editDataCompra">
+                </div>
+                <div class="form-group">
+                    <label>Data fatura 1ª parcela</label>
                     <input type="date" id="editData">
                 </div>
                 <div class="form-group">
@@ -206,6 +246,12 @@
                         <option>Outro</option>
                     </select>
                 </div>
+                <div class="form-group full">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="editDespRecorrente">
+                        <label>🔄 Despesa recorrente</label>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label>Status</label>
                     <select id="editStatus">
@@ -232,23 +278,72 @@
 
     <script>
         const STORAGE_KEY = 'despesas_cartao_v2';
+        const BACKUP_KEY = 'despesas_backup_auto';
         const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         let despesas = [];
+
+        function carregarLocal() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    despesas = JSON.parse(raw);
+                    console.log(`✅ Carregadas ${despesas.length} despesas do localStorage`);
+                } else {
+                    // Tentar carregar do backup automático
+                    const backup = localStorage.getItem(BACKUP_KEY);
+                    if (backup) {
+                        despesas = JSON.parse(backup);
+                        console.log(`✅ Carregadas ${despesas.length} despesas do backup`);
+                        salvarLocal(); // Restaurar para o storage principal
+                    } else {
+                        despesas = [];
+                        console.log('📭 Nenhuma despesa encontrada');
+                    }
+                }
+            } catch (e) {
+                console.error('Erro ao carregar:', e);
+                despesas = [];
+            }
+        }
 
         function salvarLocal() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(despesas));
+                // Fazer backup automático a cada salvamento
+                localStorage.setItem(BACKUP_KEY, JSON.stringify(despesas));
+                console.log(`💾 Salvas ${despesas.length} despesas no localStorage e backup`);
             } catch (e) {
                 console.error('Erro ao salvar:', e);
             }
         }
 
-        function carregarLocal() {
+        function fazerBackupAutomatico() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) despesas = JSON.parse(raw);
+                const backup = {
+                    data: new Date().toISOString(),
+                    quantidade: despesas.length,
+                    dados: despesas
+                };
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `backup_despesas_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                toast('Backup manual criado com sucesso!');
             } catch (e) {
+                toast('Erro ao criar backup');
+            }
+        }
+
+        function limparTodasDespesas() {
+            if (confirm('⚠️ ATENÇÃO: Isso irá remover TODAS as despesas cadastradas. Esta ação não pode ser desfeita. Deseja continuar?')) {
                 despesas = [];
+                salvarLocal();
+                renderTabela();
+                renderSummary();
+                toast('Todas as despesas foram removidas.');
             }
         }
 
@@ -298,14 +393,16 @@
         function addDespesa() {
             const desc = document.getElementById('desc').value.trim();
             const valor = parseFloat(document.getElementById('valor').value);
+            const dataCompra = document.getElementById('dataCompra').value;
             const data = document.getElementById('data').value;
             const categoria = document.getElementById('categoria').value;
             const cartao = document.getElementById('cartao').value;
             const parcelas = parseInt(document.getElementById('parcelas').value);
+            const despRecorrente = document.getElementById('despRecorrente').checked;
             const status = document.getElementById('status').value;
             const devedor = document.getElementById('devedor').value;
 
-            if (!desc || !valor || !data || !categoria || !cartao) {
+            if (!desc || !valor || !dataCompra || !data || !categoria || !cartao) {
                 toast('Preencha todos os campos obrigatórios.');
                 return;
             }
@@ -326,26 +423,31 @@
                     grupoId,
                     desc,
                     valor: valorParcela,
+                    dataCompra: dataCompra,
                     data: dataParc,
                     categoria,
                     cartao,
                     parcelaAtual: i + 1,
                     parcelaTotal: parcelas,
+                    despRecorrente: despRecorrente,
                     status,
                     devedor
                 };
             });
 
-            despesas.unshift(...novas);
+            despesas = [...novas, ...despesas];
             salvarLocal();
             renderTabela();
             renderSummary();
 
             document.getElementById('desc').value = '';
             document.getElementById('valor').value = '';
+            document.getElementById('dataCompra').valueAsDate = new Date();
+            document.getElementById('data').valueAsDate = new Date();
             document.getElementById('categoria').value = '';
             document.getElementById('cartao').value = '';
             document.getElementById('parcelas').value = '1';
+            document.getElementById('despRecorrente').checked = false;
             document.getElementById('status').value = 'pendente';
 
             const msg = parcelas === 1
@@ -361,9 +463,11 @@
             document.getElementById('editId').value = id;
             document.getElementById('editDesc').value = despesa.desc;
             document.getElementById('editValor').value = despesa.valor;
+            document.getElementById('editDataCompra').value = despesa.dataCompra || '';
             document.getElementById('editData').value = despesa.data;
             document.getElementById('editCategoria').value = despesa.categoria;
             document.getElementById('editCartao').value = despesa.cartao;
+            document.getElementById('editDespRecorrente').checked = despesa.despRecorrente || false;
             document.getElementById('editStatus').value = despesa.status;
             document.getElementById('editDevedor').value = despesa.devedor;
 
@@ -379,9 +483,11 @@
                     ...despesas[index],
                     desc: document.getElementById('editDesc').value,
                     valor: parseFloat(document.getElementById('editValor').value),
+                    dataCompra: document.getElementById('editDataCompra').value,
                     data: document.getElementById('editData').value,
                     categoria: document.getElementById('editCategoria').value,
                     cartao: document.getElementById('editCartao').value,
+                    despRecorrente: document.getElementById('editDespRecorrente').checked,
                     status: document.getElementById('editStatus').value,
                     devedor: document.getElementById('editDevedor').value
                 };
@@ -422,33 +528,46 @@
         function renderTabela() {
             const tbody = document.getElementById('tbody');
             if (despesas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="empty">Nenhuma despesa cadastrada ainda.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="empty">Nenhuma despesa cadastrada. Adicione uma nova despesa!</td></tr>';
                 return;
             }
             
             tbody.innerHTML = despesas.map(d => {
                 const [y, m, day] = d.data.split('-');
                 const dataFmt = `${day}/${m}/${y}`;
+                const dataCompraFmt = d.dataCompra ? (() => {
+                    const [yc, mc, dc] = d.dataCompra.split('-');
+                    return `${dc}/${mc}/${yc}`;
+                })() : '—';
                 const parcLabel = d.parcelaTotal === 1
                     ? '<span style="color:var(--text-faint);font-size:12px">à vista</span>'
                     : `<span class="parc-pill">${d.parcelaAtual}/${d.parcelaTotal}</span>`;
                 const badge = d.status === 'pago'
                     ? '<span class="badge badge-pago">pago</span>'
                     : '<span class="badge badge-pendente">pendente</span>';
-                return `<tr>
-                    <td style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${d.desc}">${d.desc}</td>
-                    <td class="col-cat"><span class="cat-pill">${d.categoria}</span></td>
-                    <td class="col-cart" style="color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.cartao}</td>
-                    <td class="mono" style="font-weight:500">${fmt(d.valor)}</td>
-                    <td style="color:var(--text-muted)">${dataFmt}</td>
-                    <td>${parcLabel}</td>
-                    <td>${badge}</td>
-                    <td style="color:var(--text-muted)">${d.devedor || '—'}</td>
-                    <td>
-                        <button class="btn-edit" onclick="editarDespesa(${d.id})" title="Editar">✏️</button>
-                        <button class="btn-del" onclick="deleteDespesa(${d.id})" title="Remover">×</button>
-                    </td>
-                </tr>`;
+                const recorrenteBadge = d.despRecorrente 
+                    ? '<span class="recorrente-badge">🔄 Recorrente</span>' 
+                    : '';
+                
+                return `
+                    <tr>
+                        <td style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${d.desc}">
+                            ${d.desc} ${recorrenteBadge}
+                        </td>
+                        <td class="col-cat"><span class="cat-pill">${d.categoria}</span></td>
+                        <td class="col-cart" style="color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.cartao}</td>
+                        <td class="mono" style="font-weight:500">${fmt(d.valor)}</td>
+                        <td style="color:var(--text-muted); font-size: 12px;">${dataCompraFmt}</td>
+                        <td style="color:var(--text-muted)">${dataFmt}</td>
+                        <td>${parcLabel}</td>
+                        <td>${badge}</td>
+                        <td style="color:var(--text-muted)">${d.devedor || '—'}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editarDespesa(${d.id})" title="Editar">✏️</button>
+                            <button class="btn-del" onclick="deleteDespesa(${d.id})" title="Remover">×</button>
+                        </td>
+                    </tr>
+                `;
             }).join('');
         }
 
@@ -460,7 +579,6 @@
             document.getElementById('count').textContent = despesas.length;
         }
 
-        // Fechar modal ao clicar fora
         window.onclick = function(event) {
             const modal = document.getElementById('editModal');
             if (event.target === modal) {
@@ -468,11 +586,18 @@
             }
         }
 
-        // Inicialização
+        // Inicialização - CARREGA DADOS AUTOMATICAMENTE
+        document.getElementById('dataCompra').valueAsDate = new Date();
         document.getElementById('data').valueAsDate = new Date();
         carregarLocal();
         renderTabela();
         renderSummary();
+        
+        if (despesas.length > 0) {
+            toast(`${despesas.length} despesa(s) carregada(s) automaticamente.`);
+        } else {
+            console.log('Nenhuma despesa encontrada. Adicione uma nova despesa!');
+        }
     </script>
 </body>
 </html>

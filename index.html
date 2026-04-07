@@ -14,26 +14,12 @@
             <p>Dashboard de gastos por cartão de crédito</p>
         </header>
 
-        <button class="btn-buscar" onclick="carregarDados()">
-            🔄 Atualizar Dados
-        </button>
-
-        <div class="filter-bar">
-            <div class="filter-group">
-                <label>🔍 Filtrar por status</label>
-                <select id="filtroStatus" class="filter-select" onchange="carregarDados()">
-                    <option value="todos">Todos</option>
-                    <option value="pendente">Pendentes</option>
-                    <option value="pago">Pagos</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>📅 Filtrar por período</label>
-                <select id="filtroPeriodo" class="filter-select" onchange="carregarDados()">
-                    <option value="todos">Todos os meses</option>
-                    <option value="proximos30">Próximos 30 dias</option>
-                    <option value="proximos60">Próximos 60 dias</option>
-                    <option value="proximos90">Próximos 90 dias</option>
+        <!-- Filtro de Faturas -->
+        <div class="filter-bar" style="margin-bottom: 1.5rem;">
+            <div class="filter-group" style="flex: 1;">
+                <label>📆 Totais das próximas faturas (vencimento dia 20):</label>
+                <select id="filtroFatura" class="filter-select" onchange="carregarDados()">
+                    <option value="0">Selecione um mês...</option>
                 </select>
             </div>
         </div>
@@ -45,11 +31,63 @@
         </a>
     </div>
 
+    <!-- Modal para exibir despesas do cartão -->
+    <div id="modalDespesas" class="despesas-modal">
+        <div class="despesas-modal-content">
+            <div class="despesas-modal-header">
+                <h2 id="modalTitulo">💳 Despesas do Cartão</h2>
+                <span class="close-modal" onclick="fecharModalDespesas()">&times;</span>
+            </div>
+            <div id="modalBody" class="despesas-list">
+                <!-- Conteúdo dinâmico -->
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script>
         const STORAGE_KEY = 'despesas_cartao_v2';
         const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        // Função para verificar se uma data é dia 20 (fatura)
+        function isDia20(data) {
+            return data.getDate() === 20;
+        }
+
+        // Função para obter a próxima data de fatura (sempre dia 20)
+        function getProximaDataFatura() {
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            
+            let dataFatura = new Date(hoje.getFullYear(), hoje.getMonth(), 20);
+            
+            // Se hoje já passou do dia 20, vai para o próximo mês
+            if (hoje.getDate() > 20) {
+                dataFatura.setMonth(dataFatura.getMonth() + 1);
+            }
+            // Se hoje é exatamente dia 20, usa este mês
+            // Se hoje é antes do dia 20, usa este mês
+            
+            return dataFatura;
+        }
+
+        // Função para formatar o nome do mês
+        function formatarMesFatura(mesesAdicionais) {
+            const dataFaturaBase = getProximaDataFatura();
+            const data = new Date(dataFaturaBase);
+            data.setMonth(data.getMonth() + mesesAdicionais);
+            return data.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+        }
+
+        // Função para obter a data da fatura (sempre dia 20)
+        function getDataFatura(mesesAdicionais) {
+            const dataFaturaBase = getProximaDataFatura();
+            const data = new Date(dataFaturaBase);
+            data.setMonth(data.getMonth() + mesesAdicionais);
+            data.setHours(0, 0, 0, 0);
+            return data;
+        }
 
         function toast(msg) {
             const el = document.getElementById('toast');
@@ -67,29 +105,38 @@
                     return;
                 }
 
-                let despesas = JSON.parse(raw);
-                const filtroStatus = document.getElementById('filtroStatus').value;
-                const filtroPeriodo = document.getElementById('filtroPeriodo').value;
+                let todasDespesas = JSON.parse(raw);
                 
-                // Aplicar filtro de status
-                if (filtroStatus !== 'todos') {
-                    despesas = despesas.filter(d => d.status === filtroStatus);
-                }
+                // Filtrar apenas despesas PENDENTES
+                let despesas = todasDespesas.filter(d => d.status === 'pendente');
                 
-                // Aplicar filtro de período (apenas para pendentes quando for período futuro)
-                if (filtroPeriodo !== 'todos' && filtroStatus !== 'pago') {
-                    const hoje = new Date();
-                    const dias = parseInt(filtroPeriodo.replace('proximos', ''));
-                    const dataLimite = new Date();
-                    dataLimite.setDate(hoje.getDate() + dias);
+                const filtroFatura = document.getElementById('filtroFatura').value;
+                const meses = parseInt(filtroFatura);
+                
+                if (meses >= 0) {  // 0 = próxima fatura, 1 = +1 mês, etc.
+                    const dataFatura = getDataFatura(meses);
+                    const dataFaturaInicio = new Date(dataFatura);
+                    dataFaturaInicio.setDate(1);
+                    dataFaturaInicio.setHours(0, 0, 0, 0);
                     
+                    const dataFaturaFim = new Date(dataFatura);
+                    dataFaturaFim.setMonth(dataFaturaFim.getMonth() + 1);
+                    dataFaturaFim.setDate(0);
+                    dataFaturaFim.setHours(23, 59, 59, 999);
+                    
+                    // Filtrar despesas que vencem no mês da fatura selecionada
                     despesas = despesas.filter(d => {
-                        const dataParcela = new Date(d.data);
-                        return dataParcela >= hoje && dataParcela <= dataLimite;
+                        const dataVencimento = new Date(d.data);
+                        return dataVencimento >= dataFaturaInicio && dataVencimento <= dataFaturaFim;
                     });
                 }
                 
-                renderizarResumo(despesas);
+                renderizarResumo(despesas, meses);
+                
+                if (despesas.length === 0 && meses >= 0) {
+                    const mesNome = formatarMesFatura(meses);
+                    toast(`Nenhuma despesa pendente para a fatura de ${mesNome}.`);
+                }
                 
             } catch (error) {
                 console.error(error);
@@ -97,11 +144,79 @@
             }
         }
 
-        function renderizarResumo(despesas) {
+        function abrirModalDespesas(cartaoNome, despesasFiltradas, meses) {
+            const modal = document.getElementById('modalDespesas');
+            const titulo = document.getElementById('modalTitulo');
+            const body = document.getElementById('modalBody');
+            
+            let subtitulo = '';
+            if (meses >= 0) {
+                const mesNome = formatarMesFatura(meses);
+                subtitulo = `<span style="font-size: 14px; color: var(--text-muted); display: block; margin-top: 5px;">Fatura de ${mesNome}</span>`;
+            }
+            
+            titulo.innerHTML = `💳 ${cartaoNome}${subtitulo}`;
+            
+            if (despesasFiltradas.length === 0) {
+                body.innerHTML = '<p style="text-align:center; padding: 2rem;">Nenhuma despesa encontrada para este cartão.</p>';
+            } else {
+                const totalCartao = despesasFiltradas.reduce((sum, d) => sum + d.valor, 0);
+                
+                body.innerHTML = `
+                    ${despesasFiltradas.map(d => {
+                        const [y, m, day] = d.data.split('-');
+                        const dataFmt = `${day}/${m}/${y}`;
+                        const dataCompraFmt = d.dataCompra ? (() => {
+                            const [yc, mc, dc] = d.dataCompra.split('-');
+                            return `${dc}/${mc}/${yc}`;
+                        })() : '—';
+                        const parcLabel = d.parcelaTotal === 1
+                            ? 'À vista'
+                            : `${d.parcelaAtual}/${d.parcelaTotal}`;
+                        const recorrenteIcon = d.despRecorrente ? ' 🔄' : '';
+                        
+                        return `
+                            <div class="despesa-item">
+                                <div class="despesa-item-header">
+                                    <span class="despesa-desc">${d.desc}${recorrenteIcon}</span>
+                                    <span class="despesa-valor">${fmt(d.valor)}</span>
+                                </div>
+                                <div class="despesa-details">
+                                    <span>📅 Compra: ${dataCompraFmt}</span>
+                                    <span>📆 Vencimento: ${dataFmt}</span>
+                                    <span>📦 ${parcLabel}</span>
+                                    <span>🏷️ ${d.categoria}</span>
+                                    <span>👤 ${d.devedor || '—'}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                    <div class="modal-total">
+                        <strong>💰 Total no cartão ${cartaoNome}:</strong>
+                        <span class="total-valor">${fmt(totalCartao)}</span>
+                    </div>
+                `;
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function fecharModalDespesas() {
+            document.getElementById('modalDespesas').style.display = 'none';
+        }
+
+        function renderizarResumo(despesas, mesesSelecionados = 0) {
             const dashboard = document.getElementById('dashboard');
             
             if (despesas.length === 0) {
-                dashboard.innerHTML = "<p style='text-align:center; padding: 2rem;'>Nenhuma despesa encontrada com os filtros selecionados.</p>";
+                dashboard.innerHTML = `
+                    <div style="text-align:center; padding: 2rem; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);">
+                        <p>Nenhuma despesa pendente encontrada.</p>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">
+                            ${mesesSelecionados >= 0 ? 'Não há despesas programadas para esta fatura.' : 'Todas as despesas estão pagas!'}
+                        </p>
+                    </div>
+                `;
                 return;
             }
             
@@ -114,11 +229,26 @@
                 const valorNumerico = parseFloat(item.valor) || 0;
                 
                 if (!resumo[nomeCartao]) {
-                    resumo[nomeCartao] = 0;
+                    resumo[nomeCartao] = {
+                        total: 0,
+                        itens: []
+                    };
                 }
-                resumo[nomeCartao] += valorNumerico;
+                resumo[nomeCartao].total += valorNumerico;
+                resumo[nomeCartao].itens.push(item);
                 totalGeral += valorNumerico;
             });
+            
+            // Título do período
+            let tituloPeriodo = '';
+            if (mesesSelecionados >= 0) {
+                const mesNome = formatarMesFatura(mesesSelecionados);
+                const dataFatura = getDataFatura(mesesSelecionados);
+                const dataFormatada = dataFatura.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                tituloPeriodo = `<div style="margin-bottom: 1rem; padding: 0.75rem; background: var(--bg); border-radius: var(--radius-sm); text-align: center;">
+                    <strong>📆 Fatura de ${mesNome}</strong> (vencimento: ${dataFormatada})
+                </div>`;
+            }
             
             // Criar card de total geral
             const totalCard = document.createElement('div');
@@ -127,10 +257,10 @@
             totalCard.style.color = 'white';
             totalCard.style.marginBottom = '1.5rem';
             totalCard.innerHTML = `
-                <strong style="font-size: 16px;">💰 Total dos filtros</strong>
+                <strong style="font-size: 16px;">💰 Total ${mesesSelecionados >= 0 ? 'da fatura' : 'das pendentes'}</strong>
                 <span style="font-size: 24px; font-weight: 700;">${fmt(totalGeral)}</span>
             `;
-            dashboard.innerHTML = '';
+            dashboard.innerHTML = tituloPeriodo;
             dashboard.appendChild(totalCard);
             
             // Criar cards por cartão
@@ -140,41 +270,69 @@
                 const div = document.createElement('div');
                 div.className = 'card-summary';
                 div.innerHTML = `
-                    <button class="btn-cartao">${cartao}</button>
-                    <span class="valor-soma">${fmt(resumo[cartao])}</span>
+                    <button class="btn-cartao" data-cartao="${cartao}">${cartao}</button>
+                    <span class="valor-soma">${fmt(resumo[cartao].total)}</span>
                 `;
+                
+                // Adicionar evento de clique para mostrar despesas do cartão
+                const btn = div.querySelector('.btn-cartao');
+                btn.addEventListener('click', () => {
+                    abrirModalDespesas(cartao, resumo[cartao].itens, mesesSelecionados);
+                });
+                
                 dashboard.appendChild(div);
             });
-            
-            // Adicionar estatísticas extras
-            const statsDiv = document.createElement('div');
-            statsDiv.style.marginTop = '1rem';
-            statsDiv.style.padding = '1rem';
-            statsDiv.style.background = 'var(--surface)';
-            statsDiv.style.borderRadius = 'var(--radius)';
-            statsDiv.style.border = '1px solid var(--border)';
-            
-            const totalParcelas = despesas.length;
-            const mediaParcela = totalGeral / totalParcelas;
-            
-            statsDiv.innerHTML = `
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; text-align: center;">
-                    <div>
-                        <div style="font-size: 11px; color: var(--text-muted);">📦 Total de parcelas</div>
-                        <div style="font-size: 20px; font-weight: 700;">${totalParcelas}</div>
-                    </div>
-                    <div>
-                        <div style="font-size: 11px; color: var(--text-muted);">💳 Média por parcela</div>
-                        <div style="font-size: 20px; font-weight: 700;">${fmt(mediaParcela)}</div>
-                    </div>
-                </div>
-            `;
-            
-            dashboard.appendChild(statsDiv);
         }
 
-        // Carregar dados automaticamente ao abrir a página
-        carregarDados();
+        // Atualizar as opções do select com os meses dinâmicos
+        function atualizarOpcoesSelect() {
+            const select = document.getElementById('filtroFatura');
+            const hoje = new Date();
+            const diaAtual = hoje.getDate();
+            
+            let options = [
+                '<option value="">Selecione um mês...</option>'
+            ];
+            
+            // Mostrar as próximas 6 faturas (incluindo a atual se for dia 20 ou antes)
+            for (let i = 0; i < 6; i++) {
+                const dataFatura = getDataFatura(i);
+                const mesNome = dataFatura.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+                const dataFormatada = dataFatura.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                
+                let prefixo = '';
+                if (i === 0) {
+                    if (diaAtual <= 20) {
+                        prefixo = '⭐ PRÓXIMA - ';
+                    } else {
+                        prefixo = '📅 PRÓXIMA - ';
+                    }
+                } else if (i === 1 && diaAtual > 20) {
+                    prefixo = '⭐ PRÓXIMA - ';
+                }
+                
+                options.push(`<option value="${i}">${prefixo}Fatura ${dataFormatada} (${mesNome})</option>`);
+            }
+            
+            select.innerHTML = options.join('');
+            
+            // Pré-selecionar a próxima fatura (índice 0) automaticamente
+            if (options.length > 1) {
+                select.value = "0";
+                carregarDados();
+            }
+        }
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalDespesas');
+            if (event.target === modal) {
+                fecharModalDespesas();
+            }
+        }
+
+        // Inicialização - Atualizar opções e carregar dados automaticamente
+        atualizarOpcoesSelect();
     </script>
 </body>
 </html>
