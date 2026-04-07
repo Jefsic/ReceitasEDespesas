@@ -3,141 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receitas e Despesas - Home</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #f5f4f0;
-            --surface: #ffffff;
-            --border: #e2e0d8;
-            --text: #1a1a18;
-            --accent: #1a1a18;
-            --radius: 12px;
-            --danger: #c0392b;
-        }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 2rem;
-        }
-
-        .container { width: 100%; max-width: 600px; }
-
-        header { text-align: center; margin-bottom: 2rem; }
-        h1 { font-size: 28px; font-weight: 700; }
-
-        /* Botão de Busca Superior */
-        .btn-buscar {
-            width: 100%;
-            background: #ffffff;
-            color: var(--accent);
-            border: 2px solid var(--accent);
-            padding: 15px;
-            border-radius: var(--radius);
-            font-weight: 700;
-            cursor: pointer;
-            margin-bottom: 1.5rem;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-buscar:hover {
-            background: var(--accent);
-            color: #ffffff;
-        }
-
-        /* Card de cada Cartão */
-        .card-summary {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.2rem 1.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .btn-cartao {
-            background: #e2e0d8;
-            color: var(--text);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        .valor-soma {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--danger);
-        }
-
-        /* Botão Inferior de Navegação Estilizado */
-        .nav-link {
-            display: block;
-            text-align: center;
-            margin-top: 2rem;
-            background: #ffffff;
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 700;
-            border: 1px solid var(--accent);
-            padding: 15px;
-            border-radius: var(--radius);
-            transition: all 0.2s;
-            text-transform: uppercase;
-        }
-
-        .nav-link:hover {
-            background: var(--accent);
-            color: white;
-        }
-    </style>
+    <title>Receitas e Despesas - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="container">
+        <header>
+            <h1>📊 Receitas e Despesas</h1>
+            <p>Dashboard de gastos por cartão de crédito</p>
+        </header>
 
-<div class="container">
-    <header>
-        <h1>Receitas e Despesas</h1>
-    </header>
+        <button class="btn-buscar" onclick="carregarDados()">
+            🔄 Atualizar Dados
+        </button>
 
-    <button class="btn-buscar" onclick="buscarDados()">Buscar Dados do Cartão</button>
-
-    <div id="dashboard">
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label>🔍 Filtrar por status</label>
+                <select id="filtroStatus" class="filter-select" onchange="carregarDados()">
+                    <option value="todos">Todos</option>
+                    <option value="pendente">Pendentes</option>
+                    <option value="pago">Pagos</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>📅 Filtrar por período</label>
+                <select id="filtroPeriodo" class="filter-select" onchange="carregarDados()">
+                    <option value="todos">Todos os meses</option>
+                    <option value="proximos30">Próximos 30 dias</option>
+                    <option value="proximos60">Próximos 60 dias</option>
+                    <option value="proximos90">Próximos 90 dias</option>
+                </select>
+            </div>
         </div>
 
-    <a href="ReceitasEDespesas.html" class="nav-link">Gerenciar Lançamentos →</a>
-</div>
+        <div id="dashboard"></div>
 
-<script>
-    // Nome exato do arquivo na sua pasta
-    const JSON_FILE = 'despesas_2026-04-05.json';
+        <a href="ReceitasEDespesas.html" class="nav-link">
+            ✏️ Gerenciar Lançamentos →
+        </a>
+    </div>
 
-    async function buscarDados() {
-        const dashboard = document.getElementById('dashboard');
-        
-        try {
-            const response = await fetch(JSON_FILE);
-            if (!response.ok) throw new Error("Arquivo não encontrado.");
+    <div class="toast" id="toast"></div>
 
-            const despesas = await response.json();
+    <script>
+        const STORAGE_KEY = 'despesas_cartao_v2';
+        const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        function toast(msg) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 2400);
+        }
+
+        function carregarDados() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) {
+                    document.getElementById('dashboard').innerHTML = 
+                        '<p style="text-align:center; padding: 2rem;">Nenhum dado encontrado. <br> <a href="ReceitasEDespesas.html" style="color: var(--accent);">Clique aqui para adicionar despesas</a></p>';
+                    return;
+                }
+
+                let despesas = JSON.parse(raw);
+                const filtroStatus = document.getElementById('filtroStatus').value;
+                const filtroPeriodo = document.getElementById('filtroPeriodo').value;
+                
+                // Aplicar filtro de status
+                if (filtroStatus !== 'todos') {
+                    despesas = despesas.filter(d => d.status === filtroStatus);
+                }
+                
+                // Aplicar filtro de período (apenas para pendentes quando for período futuro)
+                if (filtroPeriodo !== 'todos' && filtroStatus !== 'pago') {
+                    const hoje = new Date();
+                    const dias = parseInt(filtroPeriodo.replace('proximos', ''));
+                    const dataLimite = new Date();
+                    dataLimite.setDate(hoje.getDate() + dias);
+                    
+                    despesas = despesas.filter(d => {
+                        const dataParcela = new Date(d.data);
+                        return dataParcela >= hoje && dataParcela <= dataLimite;
+                    });
+                }
+                
+                renderizarResumo(despesas);
+                
+            } catch (error) {
+                console.error(error);
+                toast("Erro ao carregar dados do localStorage");
+            }
+        }
+
+        function renderizarResumo(despesas) {
+            const dashboard = document.getElementById('dashboard');
             
-            // Agrupamento Robusto: Garante que cada cartão único crie uma entrada
+            if (despesas.length === 0) {
+                dashboard.innerHTML = "<p style='text-align:center; padding: 2rem;'>Nenhuma despesa encontrada com os filtros selecionados.</p>";
+                return;
+            }
+            
+            // Agrupar por cartão
             const resumo = {};
+            let totalGeral = 0;
             
             despesas.forEach(item => {
                 const nomeCartao = item.cartao || "Outros";
@@ -147,41 +117,64 @@
                     resumo[nomeCartao] = 0;
                 }
                 resumo[nomeCartao] += valorNumerico;
+                totalGeral += valorNumerico;
             });
-
-            renderizar(resumo);
-
-        } catch (error) {
-            console.error(error);
-            alert("Erro ao ler dados. Verifique se o arquivo " + JSON_FILE + " está na mesma pasta.");
-        }
-    }
-
-    function renderizar(resumo) {
-        const dashboard = document.getElementById('dashboard');
-        dashboard.innerHTML = ""; // Limpa a tela
-        
-        const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-        // Itera sobre todas as chaves do objeto (Itaú, Nubank, etc)
-        const cartoesEncontrados = Object.keys(resumo);
-
-        if (cartoesEncontrados.length === 0) {
-            dashboard.innerHTML = "<p style='text-align:center'>Nenhum cartão encontrado.</p>";
-            return;
-        }
-
-        cartoesEncontrados.forEach(cartao => {
-            const div = document.createElement('div');
-            div.className = 'card-summary';
-            div.innerHTML = `
-                <button class="btn-cartao">${cartao}</button>
-                <span class="valor-soma">${fmt(resumo[cartao])}</span>
+            
+            // Criar card de total geral
+            const totalCard = document.createElement('div');
+            totalCard.className = 'card-summary';
+            totalCard.style.background = 'var(--accent)';
+            totalCard.style.color = 'white';
+            totalCard.style.marginBottom = '1.5rem';
+            totalCard.innerHTML = `
+                <strong style="font-size: 16px;">💰 Total dos filtros</strong>
+                <span style="font-size: 24px; font-weight: 700;">${fmt(totalGeral)}</span>
             `;
-            dashboard.appendChild(div);
-        });
-    }
-</script>
+            dashboard.innerHTML = '';
+            dashboard.appendChild(totalCard);
+            
+            // Criar cards por cartão
+            const cartoesEncontrados = Object.keys(resumo).sort();
+            
+            cartoesEncontrados.forEach(cartao => {
+                const div = document.createElement('div');
+                div.className = 'card-summary';
+                div.innerHTML = `
+                    <button class="btn-cartao">${cartao}</button>
+                    <span class="valor-soma">${fmt(resumo[cartao])}</span>
+                `;
+                dashboard.appendChild(div);
+            });
+            
+            // Adicionar estatísticas extras
+            const statsDiv = document.createElement('div');
+            statsDiv.style.marginTop = '1rem';
+            statsDiv.style.padding = '1rem';
+            statsDiv.style.background = 'var(--surface)';
+            statsDiv.style.borderRadius = 'var(--radius)';
+            statsDiv.style.border = '1px solid var(--border)';
+            
+            const totalParcelas = despesas.length;
+            const mediaParcela = totalGeral / totalParcelas;
+            
+            statsDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; text-align: center;">
+                    <div>
+                        <div style="font-size: 11px; color: var(--text-muted);">📦 Total de parcelas</div>
+                        <div style="font-size: 20px; font-weight: 700;">${totalParcelas}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 11px; color: var(--text-muted);">💳 Média por parcela</div>
+                        <div style="font-size: 20px; font-weight: 700;">${fmt(mediaParcela)}</div>
+                    </div>
+                </div>
+            `;
+            
+            dashboard.appendChild(statsDiv);
+        }
 
+        // Carregar dados automaticamente ao abrir a página
+        carregarDados();
+    </script>
 </body>
 </html>
