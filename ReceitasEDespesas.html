@@ -115,6 +115,7 @@
             <div class="filters-title">
                 🔍 Filtros Avançados
                 <button class="btn-limpar-filtros" onclick="limparFiltros()">Limpar filtros</button>
+                <button class="btn-limpar-filtros" onclick="limparBusca()">🗑️ Limpar busca</button>
             </div>
             <div class="filters-grid">
                 <div class="filter-item">
@@ -141,6 +142,10 @@
                         <option value="Ambos">Ambos</option>
                     </select>
                 </div>
+                <div class="filter-item">
+                    <label>🔍 BUSCAR POR TEXTO NO CAMPO DESCRIÇÃO</label>
+                    <input type="text" id="filtroBusca" placeholder="Digite para filtrar descrição..." onkeyup="aplicarFiltros()" style="width: 100%;">
+                </div>
             </div>
         </div>
 
@@ -153,7 +158,6 @@
             <button class="btn-outline" onclick="exportarJSON()">↓ Exportar JSON</button>
             <button class="btn-outline" onclick="document.getElementById('importInput').click()">↑ Importar JSON</button>
             <input type="file" id="importInput" accept=".json" style="display:none" onchange="importarJSON(event)">
-            <button class="btn-outline" onclick="limparTodasDespesas()" style="border-color: var(--danger); color: var(--danger);">🗑️ Limpar todas</button>
         </div>
 
         <div class="table-wrap">
@@ -343,6 +347,7 @@
             const visualizacao = document.getElementById('filtroVisualizacao').value;
             const cartaoSelecionado = document.getElementById('filtroCartao').value;
             const devedorSelecionado = document.getElementById('filtroDevedor').value;
+            const textoBusca = document.getElementById('filtroBusca').value.toLowerCase().trim();
             
             document.getElementById('filtroCartaoContainer').style.display = 
                 visualizacao === 'porCartao' ? 'block' : 'none';
@@ -363,6 +368,13 @@
                 filtradas = filtradas.filter(d => d.devedor === devedorSelecionado);
             }
             
+            // Filtro de busca por texto na descrição
+            if (textoBusca !== '') {
+                filtradas = filtradas.filter(d => 
+                    d.desc.toLowerCase().includes(textoBusca)
+                );
+            }
+            
             despesasFiltradas = filtradas;
             renderTabela();
         }
@@ -371,8 +383,15 @@
             document.getElementById('filtroVisualizacao').value = 'proximaFatura';
             document.getElementById('filtroCartao').value = '';
             document.getElementById('filtroDevedor').value = '';
+            document.getElementById('filtroBusca').value = '';
             aplicarFiltros();
             toast('Filtros limpos!');
+        }
+
+        function limparBusca() {
+            document.getElementById('filtroBusca').value = '';
+            aplicarFiltros();
+            toast('Busca limpa!');
         }
 
         function salvarLocal() {
@@ -531,15 +550,6 @@
 
         function fecharModal() {
             document.getElementById('editModal').style.display = 'none';
-        }
-
-        function limparTodasDespesas() {
-            if (confirm('⚠️ ATENÇÃO: Isso irá remover TODAS as despesas. Esta ação não pode ser desfeita. Deseja continuar?')) {
-                despesas = [];
-                salvarLocal();
-                aplicarFiltros();
-                toast('Todas as despesas foram removidas.');
-            }
         }
 
         function deleteDespesa(id) {
