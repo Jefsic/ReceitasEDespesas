@@ -6,6 +6,152 @@
     <title>Despesas de Cartão - Gerenciador</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Estilos para os novos filtros com checkboxes */
+        .filters-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filters-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .filter-group label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+        
+        .checkbox-group-horizontal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .checkbox-group-horizontal label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            text-transform: none;
+            font-weight: normal;
+            color: var(--text);
+            cursor: pointer;
+        }
+        
+        .checkbox-group-horizontal input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .totalizador-container {
+            background: var(--bg);
+            border-radius: var(--radius);
+            padding: 1rem;
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .totalizador-content {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .totalizador-item {
+            background: var(--surface);
+            padding: 8px 20px;
+            border-radius: 20px;
+        }
+        
+        .totalizador-item.jefferson { border-left: 3px solid #3b82f6; }
+        .totalizador-item.erika { border-left: 3px solid #ec489a; }
+        .totalizador-item.ambos { border-left: 3px solid #10b981; }
+        .totalizador-item.total {
+            background: var(--accent);
+            color: white;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .result-count {
+            font-size: 12px;
+            color: var(--text-muted);
+            background: var(--bg);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        
+        .btn-limpar-filtros {
+            background: none;
+            border: 1px solid var(--border);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-limpar-filtros:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+        
+        /* Estilo para o totalizador inferior */
+        .footer-totalizador {
+            background: var(--accent);
+            color: white;
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -40,51 +186,23 @@
                         <label for="categoria">Categoria *</label>
                         <select id="categoria" required>
                             <option value="">Selecione...</option>
-                            <option>Alimentação</option>
-                            <option>Transporte</option>
-                            <option>Saúde</option>
-                            <option>Lazer</option>
-                            <option>Educação</option>
-                            <option>Casa</option>
-                            <option>Assinaturas</option>
-                            <option>Roupas</option>
-                            <option>Viagem</option>
-                            <option>Outros</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="cartao">Cartão *</label>
                         <select id="cartao" required>
                             <option value="">Selecione...</option>
-                            <option>Caixa Visa</option>
-                            <option>Caixa Elo</option>
-                            <option>Caixa Black</option>
-                            <option>Nubank</option>
-                            <option>Inter</option>
-                            <option>Porto</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="parcelas">Parcelas (até 24x)</label>
                         <select id="parcelas">
                             <option value="1">1x (à vista)</option>
-                            <option value="2">2x</option><option value="3">3x</option><option value="4">4x</option>
-                            <option value="5">5x</option><option value="6">6x</option><option value="7">7x</option>
-                            <option value="8">8x</option><option value="9">9x</option><option value="10">10x</option>
-                            <option value="11">11x</option><option value="12">12x</option><option value="13">13x</option>
-                            <option value="14">14x</option><option value="15">15x</option><option value="16">16x</option>
-                            <option value="17">17x</option><option value="18">18x</option><option value="19">19x</option>
-                            <option value="20">20x</option><option value="21">21x</option><option value="22">22x</option>
-                            <option value="23">23x</option><option value="24">24x</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="devedor">Devedor</label>
-                        <select id="devedor">
-                            <option value="Jefferson">Jefferson</option>
-                            <option value="Erika">Erika</option>
-                            <option value="Ambos">Ambos</option>
-                        </select>
+                        <select id="devedor"></select>
                     </div>
                     <div class="form-group">
                         <div class="checkbox-group" style="margin-top: 24px;">
@@ -96,68 +214,76 @@
                         </div>
                     </div>
                     <div class="form-group full">
-                        <button type="submit" class="btn-primary" onclick="addDespesa()">Adicionar despesa</button>
+                        <button type="submit" class="btn-primary">Adicionar despesa</button>
                     </div>
                 </div>
             </form>
         </div>
 
-        <!-- Cards de resumo por banco para a próxima fatura -->
-        <div style="margin-bottom: 1.5rem;">
-            <p class="section-label">📆 Próxima fatura (vencimento dia 20) - Total por cartão</p>
-            <div id="resumoProximaFatura" style="display: flex; flex-direction: column; gap: 0.5rem;">
-                <!-- Cards serão inseridos aqui dinamicamente -->
+        <!-- Painel de Filtros com Checkboxes -->
+        <div class="filters-panel">
+            <div class="filters-title">
+                <span>🔍 FILTROS</span>
+                <div style="display: flex; gap: 8px; margin-left: auto;">
+                    <button class="btn-outline" onclick="exportarDados()" style="font-size: 12px; padding: 4px 12px;">↓ Exportar JSON</button>
+                    <button class="btn-outline" onclick="document.getElementById('importInput').click()" style="font-size: 12px; padding: 4px 12px;">↑ Importar JSON</button>
+                    <input type="file" id="importInput" accept=".json" style="display:none" onchange="importarDados(event)">
+                </div>
+            </div>
+            
+            <!-- Filtro de Fatura -->
+            <div class="filter-group">
+                <label>📆 FATURA</label>
+                <div class="checkbox-group-horizontal">
+                    <label>
+                        <input type="checkbox" id="filtroProximaFatura" checked>
+                        Apenas próxima fatura (vencimento dia 20)
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Filtro de Cartão (checkboxes dinâmicos) -->
+            <div class="filter-group">
+                <label>💳 CARTÃO</label>
+                <div class="checkbox-group-horizontal" id="filtroCartoesContainer">
+                    <!-- Gerado dinamicamente pelo JavaScript -->
+                    <span style="color: var(--text-muted);">Carregando cartões...</span>
+                </div>
+            </div>
+            
+            <!-- Filtro de Devedor -->
+            <div class="filter-group">
+                <label>👤 DEVEDOR</label>
+                <div class="checkbox-group-horizontal">
+                    <label><input type="checkbox" value="Jefferson" class="filtro-devedor-checkbox" checked> Jefferson</label>
+                    <label><input type="checkbox" value="Erika" class="filtro-devedor-checkbox" checked> Erika</label>
+                    <label><input type="checkbox" value="Ambos" class="filtro-devedor-checkbox" checked> Ambos</label>
+                </div>
+            </div>
+            
+            <!-- Busca por texto -->
+            <div class="filter-group">
+                <label>🔍 BUSCAR NA DESCRIÇÃO</label>
+                <input type="text" id="filtroBusca" placeholder="Digite para filtrar..." style="width: 100%; padding: 8px 12px;">
+            </div>
+            
+            <!-- Botões de ação -->
+            <div class="filter-actions">
+                <button class="btn-primary" onclick="aplicarFiltros()" style="width: auto; padding: 8px 24px;">Aplicar Filtros</button>
+                <button class="btn-outline" onclick="limparFiltros()" style="width: auto;">Limpar Filtros</button>
             </div>
         </div>
 
-        <!-- Painel de Filtros Avançados -->
-        <div class="filters-panel">
-            <div class="filters-title">
-                🔍 Filtros Avançados
-                <button class="btn-limpar-filtros" onclick="limparFiltros()">Limpar filtros</button>
-                <button class="btn-limpar-filtros" onclick="limparBusca()">🗑️ Limpar busca</button>
-            </div>
-            <div class="filters-grid">
-                <div class="filter-item">
-                    <label>📋 Tipo de visualização</label>
-                    <select id="filtroVisualizacao" onchange="aplicarFiltros()">
-                        <option value="proximaFatura">📆 Próxima fatura (dia 20)</option>
-                        <option value="todas">📋 Todas as despesas cadastradas</option>
-                        <option value="porCartao">💳 Por cartão</option>
-                        <option value="porDevedor">👥 Por devedor</option>
-                    </select>
-                </div>
-                <div class="filter-item" id="filtroCartaoContainer" style="display: none;">
-                    <label>💳 Selecionar cartão</label>
-                    <select id="filtroCartao" onchange="aplicarFiltros()">
-                        <option value="">Todos os cartões</option>
-                    </select>
-                </div>
-                <div class="filter-item" id="filtroDevedorContainer" style="display: none;">
-                    <label>👤 Selecionar devedor</label>
-                    <select id="filtroDevedor" onchange="aplicarFiltros()">
-                        <option value="">Todos</option>
-                        <option value="Jefferson">Jefferson</option>
-                        <option value="Erika">Erika</option>
-                        <option value="Ambos">Ambos</option>
-                    </select>
-                </div>
-                <div class="filter-item">
-                    <label>🔍 BUSCAR POR TEXTO NO CAMPO DESCRIÇÃO</label>
-                    <input type="text" id="filtroBusca" placeholder="Digite para filtrar descrição..." onkeyup="aplicarFiltros()" style="width: 100%;">
-                </div>
+        <!-- Totalizador superior (sempre visível) -->
+        <div id="totalizadorContainer" class="totalizador-container">
+            <div class="totalizador-content">
+                <span style="color: var(--text-muted);">Nenhum filtro aplicado</span>
             </div>
         </div>
 
         <div class="info-bar">
-            <p class="section-label" style="margin-bottom: 0;">📋 Despesas Cadastradas - filtros</p>
+            <p class="section-label" style="margin-bottom: 0;">📋 Despesas Cadastradas</p>
             <div class="result-count" id="resultCount">0 despesa(s)</div>
-        </div>
-
-        <div class="toolbar">
-            <button class="btn-outline" onclick="exportarJSON()">↓ Exportar JSON</button>
-            <button class="btn-outline" onclick="document.getElementById('importInput').click()">↑ Importar JSON</button>
-            <input type="file" id="importInput" accept=".json" style="display:none" onchange="importarJSON(event)">
         </div>
 
         <div class="table-wrap">
@@ -194,8 +320,13 @@
             </table>
         </div>
         
+        <!-- NOVO: Totalizador inferior (abaixo da tabela) -->
+        <div id="footerTotalizador" class="footer-totalizador">
+            Total: R$ 0,00
+        </div>
+        
         <div style="margin-top: 1rem; padding: 0.75rem; background: var(--bg); border-radius: var(--radius-sm); font-size: 12px; color: var(--text-muted); text-align: center;">
-            💡 Dica: Use os filtros para visualizar apenas as despesas que você precisa. Os dados são salvos automaticamente.
+            💡 Dica: Marque múltiplos cartões ou devedores para combinar filtros. Os dados são salvos automaticamente.
         </div>
     </div>
 
@@ -224,18 +355,11 @@
                 </div>
                 <div class="form-group">
                     <label>Categoria</label>
-                    <select id="editCategoria">
-                        <option>Alimentação</option><option>Transporte</option><option>Saúde</option>
-                        <option>Lazer</option><option>Educação</option><option>Casa</option>
-                        <option>Assinaturas</option><option>Roupas</option><option>Viagem</option><option>Outros</option>
-                    </select>
+                    <select id="editCategoria"></select>
                 </div>
                 <div class="form-group">
                     <label>Cartão</label>
-                    <select id="editCartao">
-                        <option>Caixa Visa</option><option>Caixa Elo</option><option>Caixa Black</option>
-                        <option>Nubank</option><option>Inter</option><option>Porto</option>
-                    </select>
+                    <select id="editCartao"></select>
                 </div>
                 <div class="form-group">
                     <div class="checkbox-group" style="margin-top: 24px;">
@@ -245,9 +369,7 @@
                 </div>
                 <div class="form-group">
                     <label>Devedor</label>
-                    <select id="editDevedor">
-                        <option>Jefferson</option><option>Erika</option><option>Ambos</option>
-                    </select>
+                    <select id="editDevedor"></select>
                 </div>
                 <div class="form-group full">
                     <button class="btn-primary" onclick="salvarEdicao()">Salvar Alterações</button>
@@ -258,242 +380,219 @@
 
     <div class="toast" id="toast"></div>
 
+    <script src="shared.js"></script>
     <script>
-        const STORAGE_KEY = 'despesas_cartao_v2';
-        const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        // ========== VARIÁVEIS GLOBAIS ==========
         let despesas = [];
         let despesasFiltradas = [];
-
-        function getProximaDataFatura() {
-            const hoje = new Date();
-            hoje.setHours(0, 0, 0, 0);
-            let dataFatura = new Date(hoje.getFullYear(), hoje.getMonth(), 20);
-            if (hoje.getDate() > 20) {
-                dataFatura.setMonth(dataFatura.getMonth() + 1);
-            }
-            return dataFatura;
-        }
-
-        function carregarLocal() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) {
-                    despesas = JSON.parse(raw);
-                    console.log(`✅ Carregadas ${despesas.length} despesas`);
-                } else {
-                    despesas = [];
-                }
-                atualizarSelects();
-                atualizarResumoProximaFatura();
-                aplicarFiltros();
-            } catch (e) {
-                console.error('Erro:', e);
-                despesas = [];
-            }
-        }
-
-        function atualizarResumoProximaFatura() {
-            const { inicio, fim } = getDataFaturaProxima();
-            const despesasProximaFatura = despesas.filter(d => {
-                const dataVencto = new Date(d.data);
-                return dataVencto >= inicio && dataVencto <= fim;
+        
+        // ========== INICIALIZAÇÃO DOS SELECTS ==========
+        function inicializarSelects() {
+            // Categorias
+            const categoriaSelect = document.getElementById('categoria');
+            Shared.CATEGORIAS.forEach(cat => {
+                categoriaSelect.innerHTML += `<option>${cat}</option>`;
             });
             
-            const resumoPorCartao = {};
-            despesasProximaFatura.forEach(d => {
-                const cartao = d.cartao;
-                if (!resumoPorCartao[cartao]) {
-                    resumoPorCartao[cartao] = 0;
-                }
-                resumoPorCartao[cartao] += d.valor;
+            // Cartões
+            const cartaoSelect = document.getElementById('cartao');
+            Shared.CARTOES.forEach(cartao => {
+                cartaoSelect.innerHTML += `<option>${cartao}</option>`;
             });
             
-            const container = document.getElementById('resumoProximaFatura');
-            const cartoes = Object.keys(resumoPorCartao).sort();
+            // Parcelas (2 a 24)
+            const parcelasSelect = document.getElementById('parcelas');
+            for (let i = 2; i <= 24; i++) {
+                parcelasSelect.innerHTML += `<option value="${i}">${i}x</option>`;
+            }
             
-            if (cartoes.length === 0) {
-                container.innerHTML = '<div class="card-summary" style="justify-content: center; color: var(--text-muted);">Nenhuma despesa para a próxima fatura</div>';
+            // Devedores
+            const devedorSelect = document.getElementById('devedor');
+            const editDevedor = document.getElementById('editDevedor');
+            Shared.DEVEDORES.forEach(d => {
+                devedorSelect.innerHTML += `<option value="${d}">${d}</option>`;
+                editDevedor.innerHTML += `<option value="${d}">${d}</option>`;
+            });
+            
+            // Edit selects
+            const editCategoria = document.getElementById('editCategoria');
+            const editCartao = document.getElementById('editCartao');
+            Shared.CATEGORIAS.forEach(cat => {
+                editCategoria.innerHTML += `<option>${cat}</option>`;
+            });
+            Shared.CARTOES.forEach(cartao => {
+                editCartao.innerHTML += `<option>${cartao}</option>`;
+            });
+        }
+        
+        // ========== ATUALIZAR CHECKBOXES DE CARTÃO ==========
+        function atualizarCheckboxesCartao() {
+            const cartoesUnicos = [...new Set(despesas.map(d => d.cartao).filter(c => c))];
+            const container = document.getElementById('filtroCartoesContainer');
+            
+            if (cartoesUnicos.length === 0) {
+                container.innerHTML = '<span style="color: var(--text-muted);">Nenhum cartão cadastrado</span>';
                 return;
             }
             
-            container.innerHTML = cartoes.map(cartao => `
-                <div class="card-summary">
-                    <strong>${cartao}</strong>
-                    <span class="valor-soma">${fmt(resumoPorCartao[cartao])}</span>
-                </div>
+            // Gerar checkboxes para cada cartão
+            container.innerHTML = cartoesUnicos.map(cartao => `
+                <label>
+                    <input type="checkbox" value="${cartao}" class="filtro-cartao-checkbox" ${cartao === 'Porto' ? 'checked' : ''}>
+                    ${cartao}
+                </label>
             `).join('');
+            
+            // Adicionar event listeners aos novos checkboxes
+            document.querySelectorAll('.filtro-cartao-checkbox').forEach(cb => {
+                cb.addEventListener('change', () => aplicarFiltros());
+            });
         }
-
-        function atualizarSelects() {
-            const cartoes = [...new Set(despesas.map(d => d.cartao).filter(c => c))];
-            const selectCartao = document.getElementById('filtroCartao');
-            selectCartao.innerHTML = '<option value="">Todos os cartões</option>' + 
-                cartoes.map(c => `<option value="${c}">${c}</option>`).join('');
-        }
-
-        function getDataFaturaProxima() {
-            const dataFatura = getProximaDataFatura();
-            const inicio = new Date(dataFatura);
-            inicio.setDate(1);
-            inicio.setHours(0, 0, 0, 0);
-            const fim = new Date(dataFatura);
-            fim.setMonth(fim.getMonth() + 1);
-            fim.setDate(0);
-            fim.setHours(23, 59, 59, 999);
-            return { inicio, fim, dataFatura };
-        }
-
+        
+        // ========== FUNÇÕES DE FILTRO (AND entre todos os filtros) ==========
+        
         function aplicarFiltros() {
-            const visualizacao = document.getElementById('filtroVisualizacao').value;
-            const cartaoSelecionado = document.getElementById('filtroCartao').value;
-            const devedorSelecionado = document.getElementById('filtroDevedor').value;
-            const textoBusca = document.getElementById('filtroBusca').value.toLowerCase().trim();
-            
-            document.getElementById('filtroCartaoContainer').style.display = 
-                visualizacao === 'porCartao' ? 'block' : 'none';
-            document.getElementById('filtroDevedorContainer').style.display = 
-                visualizacao === 'porDevedor' ? 'block' : 'none';
-            
             let filtradas = [...despesas];
             
-            if (visualizacao === 'proximaFatura') {
-                const { inicio, fim } = getDataFaturaProxima();
-                filtradas = filtradas.filter(d => {
-                    const dataVencto = new Date(d.data);
-                    return dataVencto >= inicio && dataVencto <= fim;
-                });
-            } else if (visualizacao === 'porCartao' && cartaoSelecionado) {
-                filtradas = filtradas.filter(d => d.cartao === cartaoSelecionado);
-            } else if (visualizacao === 'porDevedor' && devedorSelecionado) {
-                filtradas = filtradas.filter(d => d.devedor === devedorSelecionado);
+            // 1. Filtro de fatura (apenas próxima fatura)
+            const filtrarProximaFatura = document.getElementById('filtroProximaFatura').checked;
+            if (filtrarProximaFatura) {
+                filtradas = Shared.filtrarPorFatura(filtradas, 0);
             }
             
-            // Filtro de busca por texto na descrição
+            // 2. Filtro de cartão (múltiplos checkboxes)
+            const cartoesSelecionados = Array.from(document.querySelectorAll('.filtro-cartao-checkbox:checked'))
+                .map(cb => cb.value);
+            if (cartoesSelecionados.length > 0) {
+                filtradas = filtradas.filter(d => cartoesSelecionados.includes(d.cartao));
+            }
+            
+            // 3. Filtro de devedor (múltiplos checkboxes)
+            const devedoresSelecionados = Array.from(document.querySelectorAll('.filtro-devedor-checkbox:checked'))
+                .map(cb => cb.value);
+            if (devedoresSelecionados.length > 0) {
+                filtradas = filtradas.filter(d => devedoresSelecionados.includes(d.devedor));
+            }
+            
+            // 4. Filtro de busca por texto
+            const textoBusca = document.getElementById('filtroBusca').value.toLowerCase().trim();
             if (textoBusca !== '') {
-                filtradas = filtradas.filter(d => 
-                    d.desc.toLowerCase().includes(textoBusca)
-                );
+                filtradas = filtradas.filter(d => d.desc.toLowerCase().includes(textoBusca));
             }
             
             despesasFiltradas = filtradas;
-            renderTabela();
+            
+            // Atualizar totalizadores e tabela
+            atualizarTotalizadorSuperior();
+            atualizarTotalizadorInferior();
+            renderizarTabela();
         }
-
-        function limparFiltros() {
-            document.getElementById('filtroVisualizacao').value = 'proximaFatura';
-            document.getElementById('filtroCartao').value = '';
-            document.getElementById('filtroDevedor').value = '';
-            document.getElementById('filtroBusca').value = '';
-            aplicarFiltros();
-            toast('Filtros limpos!');
-        }
-
-        function limparBusca() {
-            document.getElementById('filtroBusca').value = '';
-            aplicarFiltros();
-            toast('Busca limpa!');
-        }
-
-        function salvarLocal() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(despesas));
-                console.log(`💾 Salvas ${despesas.length} despesas`);
-                atualizarSelects();
-                atualizarResumoProximaFatura();
-            } catch (e) {
-                console.error('Erro ao salvar:', e);
-            }
-        }
-
-        function toast(msg) {
-            const el = document.getElementById('toast');
-            el.textContent = msg;
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 2400);
-        }
-
-        function exportarJSON() {
-            if (despesas.length === 0) {
-                toast('Nenhuma despesa para exportar.');
+        
+        function atualizarTotalizadorSuperior() {
+            const container = document.getElementById('totalizadorContainer');
+            
+            if (despesasFiltradas.length === 0) {
+                container.innerHTML = `
+                    <div class="totalizador-content">
+                        <span style="color: var(--text-muted);">Nenhuma despesa encontrada</span>
+                    </div>
+                `;
                 return;
             }
-            const blob = new Blob([JSON.stringify(despesas, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `despesas_${new Date().toISOString().slice(0, 10)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            toast('Exportado com sucesso!');
-        }
-
-        function importarJSON(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => {
-                try {
-                    const dados = JSON.parse(e.target.result);
-                    if (!Array.isArray(dados)) throw new Error();
-                    despesas = dados;
-                    salvarLocal();
-                    aplicarFiltros();
-                    toast(`${dados.length} lançamento(s) importado(s).`);
-                } catch {
-                    toast('Arquivo inválido.');
+            
+            // Calcular totais por devedor com rateio para "Ambos"
+            let totalJefferson = 0;
+            let totalErika = 0;
+            let totalAmbos = 0;
+            
+            despesasFiltradas.forEach(d => {
+                if (d.devedor === 'Jefferson') {
+                    totalJefferson += d.valor;
+                } else if (d.devedor === 'Erika') {
+                    totalErika += d.valor;
+                } else if (d.devedor === 'Ambos') {
+                    totalAmbos += d.valor / 2;
                 }
-                event.target.value = '';
-            };
-            reader.readAsText(file);
+            });
+            
+            const totalGeral = Shared.calcularTotal(despesasFiltradas);
+            
+            container.innerHTML = `
+                <div class="totalizador-content">
+                    <div class="totalizador-item jefferson">
+                        <strong>👤 Jefferson:</strong> ${Shared.formatMoney(totalJefferson)}
+                    </div>
+                    <div class="totalizador-item erika">
+                        <strong>👤 Erika:</strong> ${Shared.formatMoney(totalErika)}
+                    </div>
+                    <div class="totalizador-item ambos">
+                        <strong>🤝 Ambos (cada):</strong> ${Shared.formatMoney(totalAmbos)}
+                    </div>
+                    <div class="totalizador-item total">
+                        <strong>💰 TOTAL:</strong> ${Shared.formatMoney(totalGeral)}
+                    </div>
+                </div>
+            `;
         }
-
+        
+        // NOVA FUNÇÃO: Atualizar totalizador inferior
+        function atualizarTotalizadorInferior() {
+            const footerElement = document.getElementById('footerTotalizador');
+            const totalGeral = Shared.calcularTotal(despesasFiltradas);
+            footerElement.innerHTML = `💰 TOTAL DAS DESPESAS RELACIONADAS: ${Shared.formatMoney(totalGeral)}`;
+        }
+        
+        function limparFiltros() {
+            // Manter padrões: fatura checked, cartão Porto checked, devedores todos checked
+            document.getElementById('filtroProximaFatura').checked = true;
+            
+            // Desmarcar todos os cartões e depois marcar apenas Porto
+            document.querySelectorAll('.filtro-cartao-checkbox').forEach(cb => {
+                cb.checked = (cb.value === 'Porto');
+            });
+            
+            // Marcar todos os devedores
+            document.querySelectorAll('.filtro-devedor-checkbox').forEach(cb => {
+                cb.checked = true;
+            });
+            
+            document.getElementById('filtroBusca').value = '';
+            
+            aplicarFiltros();
+            Shared.toast('Filtros resetados para os padrões!');
+        }
+        
+        // ========== CRUD ==========
+        function carregarDados() {
+            despesas = Shared.carregarDespesas();
+            atualizarCheckboxesCartao();
+            aplicarFiltros();
+        }
+        
         function addDespesa() {
             const desc = document.getElementById('desc').value.trim();
-            const valor = parseFloat(document.getElementById('valor').value);
+            const valorTotal = parseFloat(document.getElementById('valor').value);
             const dataCompra = document.getElementById('dataCompra').value;
-            const data = document.getElementById('data').value;
+            const primeiraParcela = document.getElementById('data').value;
             const categoria = document.getElementById('categoria').value;
             const cartao = document.getElementById('cartao').value;
             const parcelas = parseInt(document.getElementById('parcelas').value);
             const despRecorrente = document.getElementById('despRecorrente').checked;
             const devedor = document.getElementById('devedor').value;
-
-            if (!desc || !valor || !dataCompra || !data || !categoria || !cartao) {
-                toast('Preencha todos os campos obrigatórios.');
+            
+            if (!desc || !valorTotal || !dataCompra || !primeiraParcela || !categoria || !cartao) {
+                Shared.toast('Preencha todos os campos obrigatórios.');
                 return;
             }
-
-            const valorParcela = parseFloat((valor / parcelas).toFixed(2));
-            const [ano, mes, dia] = data.split('-').map(Number);
-            const grupoId = Date.now();
-
-            const novas = Array.from({ length: parcelas }, (_, i) => {
-                const d = new Date(ano, mes - 1 + i, dia);
-                const dataParc = [
-                    d.getFullYear(),
-                    String(d.getMonth() + 1).padStart(2, '0'),
-                    String(d.getDate()).padStart(2, '0')
-                ].join('-');
-                return {
-                    id: grupoId + i,
-                    grupoId,
-                    desc,
-                    valor: valorParcela,
-                    dataCompra: dataCompra,
-                    data: dataParc,
-                    categoria,
-                    cartao,
-                    parcelaAtual: i + 1,
-                    parcelaTotal: parcelas,
-                    despRecorrente: despRecorrente,
-                    devedor
-                };
+            
+            const novasParcelas = Shared.gerarParcelas({
+                desc, valorTotal, dataCompra, primeiraParcela,
+                categoria, cartao, parcelas, despRecorrente, devedor
             });
-
-            despesas = [...novas, ...despesas];
-            salvarLocal();
-            aplicarFiltros();
-
+            
+            Shared.adicionarDespesa(novasParcelas);
+            
+            // Limpar formulário
             document.getElementById('desc').value = '';
             document.getElementById('valor').value = '';
             document.getElementById('dataCompra').valueAsDate = new Date();
@@ -502,15 +601,16 @@
             document.getElementById('cartao').value = '';
             document.getElementById('parcelas').value = '1';
             document.getElementById('despRecorrente').checked = false;
-
-            const msg = parcelas === 1 ? 'Despesa adicionada!' : `${parcelas} parcelas de ${fmt(valorParcela)} adicionadas!`;
-            toast(msg);
+            
+            carregarDados();
+            const msg = parcelas === 1 ? 'Despesa adicionada!' : `${parcelas} parcelas adicionadas!`;
+            Shared.toast(msg);
         }
-
+        
         function editarDespesa(id) {
             const despesa = despesas.find(d => d.id === id);
             if (!despesa) return;
-
+            
             document.getElementById('editId').value = id;
             document.getElementById('editDesc').value = despesa.desc;
             document.getElementById('editValor').value = despesa.valor;
@@ -520,54 +620,65 @@
             document.getElementById('editCartao').value = despesa.cartao;
             document.getElementById('editDespRecorrente').checked = despesa.despRecorrente || false;
             document.getElementById('editDevedor').value = despesa.devedor;
-
+            
             document.getElementById('editModal').style.display = 'block';
         }
-
+        
         function salvarEdicao() {
             const id = parseInt(document.getElementById('editId').value);
-            const index = despesas.findIndex(d => d.id === id);
             
-            if (index !== -1) {
-                despesas[index] = {
-                    ...despesas[index],
-                    desc: document.getElementById('editDesc').value,
-                    valor: parseFloat(document.getElementById('editValor').value),
-                    dataCompra: document.getElementById('editDataCompra').value,
-                    data: document.getElementById('editData').value,
-                    categoria: document.getElementById('editCategoria').value,
-                    cartao: document.getElementById('editCartao').value,
-                    despRecorrente: document.getElementById('editDespRecorrente').checked,
-                    devedor: document.getElementById('editDevedor').value
-                };
-                
-                salvarLocal();
-                aplicarFiltros();
+            const sucesso = Shared.atualizarDespesa(id, {
+                desc: document.getElementById('editDesc').value,
+                valor: parseFloat(document.getElementById('editValor').value),
+                dataCompra: document.getElementById('editDataCompra').value,
+                data: document.getElementById('editData').value,
+                categoria: document.getElementById('editCategoria').value,
+                cartao: document.getElementById('editCartao').value,
+                despRecorrente: document.getElementById('editDespRecorrente').checked,
+                devedor: document.getElementById('editDevedor').value
+            });
+            
+            if (sucesso) {
+                carregarDados();
                 fecharModal();
-                toast('Despesa atualizada com sucesso!');
+                Shared.toast('Despesa atualizada com sucesso!');
+            } else {
+                Shared.toast('Erro ao atualizar despesa');
             }
         }
-
+        
         function fecharModal() {
             document.getElementById('editModal').style.display = 'none';
         }
-
+        
         function deleteDespesa(id) {
-            const d = despesas.find(x => x.id === id);
-            if (!d) return;
+            const despesa = despesas.find(d => d.id === id);
+            if (!despesa) return;
             
-            if (d.parcelaTotal > 1) {
-                const todas = confirm(`Esta despesa tem ${d.parcelaTotal} parcelas.\n\nOK = remover todas\nCancelar = remover só esta parcela`);
-                despesas = todas ? despesas.filter(x => x.grupoId !== d.grupoId) : despesas.filter(x => x.id !== id);
+            if (despesa.parcelaTotal > 1) {
+                const removerTodas = confirm(`Esta despesa tem ${despesa.parcelaTotal} parcelas.\n\nOK = remover todas\nCancelar = remover só esta parcela`);
+                Shared.deletarDespesa(id, removerTodas);
             } else {
                 if (!confirm('Remover esta despesa?')) return;
-                despesas = despesas.filter(x => x.id !== id);
+                Shared.deletarDespesa(id, false);
             }
-            salvarLocal();
-            aplicarFiltros();
-            toast('Removido com sucesso.');
+            
+            carregarDados();
+            Shared.toast('Removido com sucesso.');
         }
-
+        
+        function exportarDados() {
+            Shared.exportarJSON();
+        }
+        
+        function importarDados(event) {
+            Shared.importarJSON(event.target.files[0], () => {
+                carregarDados();
+            });
+            event.target.value = '';
+        }
+        
+        // ========== RENDERIZAÇÃO DA TABELA ==========
         function getDevedorClass(devedor) {
             const classes = {
                 'Jefferson': 'devedor-Jefferson',
@@ -576,8 +687,8 @@
             };
             return classes[devedor] || '';
         }
-
-        function renderTabela() {
+        
+        function renderizarTabela() {
             const tbody = document.getElementById('tbody');
             const resultCount = document.getElementById('resultCount');
             
@@ -589,12 +700,6 @@
             }
             
             tbody.innerHTML = despesasFiltradas.map(d => {
-                const [y, m, day] = d.data.split('-');
-                const dataFmt = `${day}/${m}/${y}`;
-                const dataCompraFmt = d.dataCompra ? (() => {
-                    const [yc, mc, dc] = d.dataCompra.split('-');
-                    return `${dc}/${mc}/${yc}`;
-                })() : '—';
                 const parcLabel = d.parcelaTotal === 1
                     ? '<span style="color:var(--text-faint);font-size:12px">à vista</span>'
                     : `<span class="parc-pill">${d.parcelaAtual}/${d.parcelaTotal}</span>`;
@@ -606,9 +711,9 @@
                         <td style="font-weight:500" title="${d.desc}">${d.desc} ${recorrenteBadge}</td>
                         <td class="col-cat"><span class="cat-pill">${d.categoria}</span></td>
                         <td class="col-cart">${d.cartao}</td>
-                        <td class="mono" style="font-weight:500">${fmt(d.valor)}</td>
-                        <td style="font-size: 12px;">${dataCompraFmt}</td>
-                        <td>${dataFmt}</td>
+                        <td class="mono" style="font-weight:500">${Shared.formatMoney(d.valor)}</td>
+                        <td style="font-size: 12px;">${Shared.formatarDataBR(d.dataCompra)}</td>
+                        <td>${Shared.formatarDataBR(d.data)}</td>
                         <td>${parcLabel}</td>
                         <td><span class="devedor-badge ${devedorClass}">${d.devedor || '—'}</span></td>
                         <td>
@@ -619,16 +724,32 @@
                 `;
             }).join('');
         }
-
+        
+        // ========== EVENTOS E INICIALIZAÇÃO ==========
+        document.getElementById('formDespesa').addEventListener('submit', (e) => {
+            e.preventDefault();
+            addDespesa();
+        });
+        
+        // Eventos para aplicar filtros automaticamente quando o usuário interage
+        document.getElementById('filtroProximaFatura').addEventListener('change', () => aplicarFiltros());
+        document.getElementById('filtroBusca').addEventListener('input', () => aplicarFiltros());
+        
+        // Event listeners para checkboxes de devedor
+        document.querySelectorAll('.filtro-devedor-checkbox').forEach(cb => {
+            cb.addEventListener('change', () => aplicarFiltros());
+        });
+        
         window.onclick = function(event) {
             const modal = document.getElementById('editModal');
             if (event.target === modal) fecharModal();
         }
-
+        
         // Inicialização
+        inicializarSelects();
         document.getElementById('dataCompra').valueAsDate = new Date();
         document.getElementById('data').valueAsDate = new Date();
-        carregarLocal();
+        carregarDados();
     </script>
 </body>
 </html>

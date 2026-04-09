@@ -18,7 +18,7 @@
         <div class="filter-bar" style="margin-bottom: 1.5rem;">
             <div class="filter-group" style="flex: 1;">
                 <label>📆 Totais das próximas faturas (vencimento dia 20):</label>
-                <select id="filtroFatura" class="filter-select" onchange="carregarDados()">
+                <select id="filtroFatura" class="filter-select">
                     <option value="0">Selecione um mês...</option>
                 </select>
             </div>
@@ -46,6 +46,7 @@
 
     <div class="toast" id="toast"></div>
 
+    <script src="shared.js"></script>
     <script>
         const STORAGE_KEY = 'despesas_cartao_v2';
         const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -96,7 +97,6 @@
 
                 let todasDespesas = JSON.parse(raw);
                 
-                // CORREÇÃO: Não filtrar por status, pois removemos esse campo
                 let despesas = todasDespesas;
                 
                 const filtroFatura = document.getElementById('filtroFatura').value;
