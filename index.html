@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receitas e Despesas - Dashboard</title>
+    <title>Despesas dos cartões de crédito - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>📊 Receitas e Despesas</h1>
+            <h1>💳 Gerenciamento de despesas com Cartão de Crédito</h1>
             <p>Dashboard de gastos por cartão de crédito</p>
         </header>
 
@@ -26,7 +26,7 @@
 
         <div id="dashboard"></div>
 
-        <a href="ReceitasEDespesas.html" class="nav-link">
+        <a href="DespesasCartaoCredito.html" class="nav-link">
             ✏️ Gerenciar Lançamentos →
         </a>
     </div>
@@ -91,7 +91,7 @@
                 const raw = localStorage.getItem(STORAGE_KEY);
                 if (!raw) {
                     document.getElementById('dashboard').innerHTML = 
-                        '<p style="text-align:center; padding: 2rem;">Nenhum dado encontrado. <br> <a href="ReceitasEDespesas.html" style="color: var(--accent);">Clique aqui para adicionar despesas</a></p>';
+                        '<p style="text-align:center; padding: 2rem;">Nenhum dado encontrado. <br> <a href="DespesasCartaoCredito.html" style="color: var(--accent);">Clique aqui para adicionar despesas</a></p>';
                     return;
                 }
 

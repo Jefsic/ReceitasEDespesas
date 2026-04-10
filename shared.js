@@ -1,4 +1,4 @@
-// shared.js - Código compartilhado entre Dashboard e Gerenciador
+// shared.js - Código compartilhido entre Dashboard e Gerenciador
 const Shared = (function() {
     'use strict';
     
@@ -45,8 +45,8 @@ const Shared = (function() {
     function getProximaDataFatura() {
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
-        let dataFatura = new Date(hoje.getFullYear(), hoje.getMonth(), DIA_FATURA);
-        if (hoje.getDate() > DIA_FATURA) {
+        let dataFatura = new Date(hoje.getFullYear(), hoje.getMonth(), 20);
+        if (hoje.getDate() > 20) {
             dataFatura.setMonth(dataFatura.getMonth() + 1);
         }
         return dataFatura;
@@ -146,10 +146,25 @@ const Shared = (function() {
         return { valorParcela, resto };
     }
     
+    // CORREÇÃO: Função somarMeses corrigida para evitar problema de fuso horário
     function somarMeses(dataStr, meses) {
-        const data = new Date(dataStr);
-        data.setMonth(data.getMonth() + meses);
-        return formatarDataInput(data);
+        if (!dataStr) return '';
+        
+        // Dividir a data em partes para evitar problemas de timezone
+        const [ano, mes, dia] = dataStr.split('-').map(Number);
+        
+        // Criar uma nova data usando os componentes numéricos
+        let novaData = new Date(ano, mes - 1, dia);
+        
+        // Adicionar os meses
+        novaData.setMonth(novaData.getMonth() + meses);
+        
+        // Extrair os componentes novamente para formatar
+        const novoAno = novaData.getFullYear();
+        const novoMes = String(novaData.getMonth() + 1).padStart(2, '0');
+        const novoDia = String(novaData.getDate()).padStart(2, '0');
+        
+        return `${novoAno}-${novoMes}-${novoDia}`;
     }
     
     function gerarParcelas(dados) {
@@ -203,6 +218,18 @@ const Shared = (function() {
     
     function calcularTotal(despesas) {
         return despesas.reduce((sum, d) => sum + (d.valor || 0), 0);
+    }
+    
+    function calcularTotalRateado(despesas) {
+        let total = 0;
+        despesas.forEach(d => {
+            if (d.devedor === 'Ambos') {
+                total += (d.valor / 2);
+            } else {
+                total += (d.valor || 0);
+            }
+        });
+        return total;
     }
     
     // ========== EXPORTAR/IMPORTAR ==========
@@ -283,6 +310,7 @@ const Shared = (function() {
         filtrarPorFatura: filtrarPorFatura,
         agruparPorCartao: agruparPorCartao,
         calcularTotal: calcularTotal,
+        calcularTotalRateado: calcularTotalRateado,
         
         // Export/Import
         exportarJSON: exportarJSON,
